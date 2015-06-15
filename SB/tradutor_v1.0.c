@@ -4,27 +4,27 @@
 #include <stdbool.h>
 #include <string.h>
 
-/*Definic√µes para tamanho dos arrays de leitura de dados*/
+/*Definicıes para tamanho dos arrays de leitura de dados*/
 #define tokensize		101
 #define linesize		312		/* tkn + " : COPY " + tkn + " , " + tkn + '\0'*/
 
-/*Caso o usu√°rio n√£o informe o nome que ele quer para o arquivo de saida*/
+/*Caso o usu·rio n„o informe o nome que ele quer para o arquivo de saida*/
 #define DEFAULT_OUTPUT_NAME		"default.o"
 
-/*************************************** DEFINI√á√ïES TABELAS E ESTRUTURAS DE DADOS *****************************************/
+/*************************************** DEFINI«’ES TABELAS E ESTRUTURAS DE DADOS *****************************************/
 typedef struct SYMBOL_TABLE_CELL SYMBOL_TABLE;
 
 struct SYMBOL_TABLE_CELL {
 
 	struct SYMBOL_TABLE_CELL *prox;
 	char *rotulo;						/*identificador*/
-	int endereco;						/*endere√ßo base*/
-	int tamanho;						/*suporte √† vetores vetores*/
-	bool constante;						/*se for constante n√£o posso alterar depois*/
+	int endereco;						/*endereÁo base*/
+	int tamanho;						/*suporte ‡ vetores*/
+	bool constante;						/*se for constante n„o posso alterar depois*/
 	bool executavel;					/*posso executar (pular para) ou nao*/
 };
 
-/**************************************** VARI√ÅVEIS GLOBAIS: ESTADO DE EXECU√á√ÉO *******************************************/
+/**************************************** VARI¡VEIS GLOBAIS: ESTADO DE EXECU«√O *******************************************/
 int error_count = 0;
 int passagem = 1;
 int line_counter = 0;
@@ -36,16 +36,16 @@ bool auto_suficiente = true;
 
 bool debug_mode1 = false;
 
-/*************************************************** DEFINI√á√ïES FUN√á√ïES ***************************************************/
+/*************************************************** DEFINI«’ES FUN«’ES ***************************************************/
 
-/*Grandes m√≥dulos que fazem o grosso do trabalho do programa*/
+/*Grandes mÛdulos que fazem o grosso do trabalho do programa*/
 bool valida_linhacomando (int argc);
 bool abre_arquivos (int argc, char *argv[], FILE *entrada, FILE *saida);
 void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela);
 void sintese (FILE *entrada, FILE *saida, SYMBOL_TABLE *comeco_fila);
 void relata_erros (int codigo, char *aux, char *aux2);
 
-/*Abre os arquivos independente da termina√ß√£o*/
+/*Abre os arquivos independente da terminaÁ„o*/
 FILE* open_sourcefile (char *name);
 FILE* open_exitfile (char *name);
 
@@ -54,6 +54,8 @@ bool get_linha (FILE *src, char *buffer);
 bool get_token (char *linha, char *token);
 void ignora_linha (FILE *src );
 bool fim_token (char c);
+
+/*Parser*/
 bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr1, int *mod1, char *opr2, int *mod2);
 bool eh_instr (char *token);
 bool eh_diretiva (char *token);
@@ -61,7 +63,7 @@ bool eh_num (char *token);
 bool rotulo_valido (char *token);
 bool eh_modificador_valido (char *buffer);
 
-/*Utiliza√ß√£o da tabela de s√≠mbolos*/
+/*UtilizaÁ„o da tabela de sÌmbolos*/
 SYMBOL_TABLE* add_tab_simbolos (char *rotulo, bool eh_constante, bool eh_executavel, int tamanho);
 void apaga_tab_simbolos (SYMBOL_TABLE *prim);
 bool tem_tabela_simbolos (SYMBOL_TABLE *prim, char *alvo);
@@ -79,26 +81,33 @@ int main (int argc,char *argv[]) {
 	FILE *entrada=NULL, *saida=NULL;
 	SYMBOL_TABLE *comeco_tabela=NULL;
 
+	/** Para o programa final a gente usa essas funÁıes, para testar direto no codeblocks eh soh usar as linhas abaixo
 	if (!valida_linhacomando(argc))
 		return 0;
 
 	if (!abre_arquivos(argc, argv, entrada, saida));
 		return 0;
+	*/
+
+	/*entrada = fopen("ArquivosTeste/dir.asm", "r");*/
+	entrada = fopen("ArquivosTeste/instr.asm", "r");
 
 	analise(entrada, comeco_tabela);
+
+	return 0;
 
 	rewind(entrada);
 	mem_counter = 0;
 	passagem++;
 	section = 0;
 
-	sintese(entrada, saida, comeco_tabela);
+	/*sintese(entrada, saida, comeco_tabela);*/
 
 	return 0;
 
 }
 
-/*Retorna true se o numero de argumentos estiver certo e false sen√£o*/
+/*Retorna true se o numero de argumentos estiver certo e false sen„o*/
 bool valida_linhacomando (int argc) {
 
 	/*Se for 1 argumento, nem tem o que fazer*/
@@ -109,7 +118,7 @@ bool valida_linhacomando (int argc) {
 	return true;
 }
 
-/*Retorna true se ambos os arquivos foram abertos com sucesso e falso caso contr√°rio */
+/*Retorna true se ambos os arquivos foram abertos com sucesso e falso caso contr·rio */
 bool abre_arquivos (int argc, char *argv[], FILE *entrada, FILE *saida) {
 
 	entrada = open_sourcefile(argv[1]);
@@ -146,38 +155,43 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 		/*Separa os tokens encontrados nas caixinhas certas*/
 		separa_linha(linha, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
 
-		/*Entrando na se√ß√£o text*/
+		/*Entrando na seÁ„o text*/
 		if (!strcmp("section", dir) && !strcmp("text", opr1))
 			section = 1;
 
-		/*Ou entrando na se√ß√£o data*/
+		/*Ou entrando na seÁ„o data*/
 		else if (!strcmp("section", dir) && !strcmp("data", opr1))
 			section = 2;
 
-		/*Ou j√° est√° na se√ß√£o text*/
+		/*Ou j· est· na seÁ„o text*/
 		else if (section == 1) {
 
 			/*Nenhuma diretiva pode vir aqui dentro*/
 			if (*dir != '\0')
-				relata_erros(215, dir, NULL);
+				relata_erros(214, dir, NULL);
 
-			/*Se cair aqui, eh uma instrucao comum. Se tiver r√≥tulo vai para a tabela de simbolos, se n√£o tiver tudo certo*/
+			/*Se cair aqui, eh uma instrucao comum. Se tiver rÛtulo vai para a tabela de simbolos, se n„o tiver tudo certo*/
 			else if (*rotulo != '\0' && rotulo_valido(rotulo)) {
 				if ((aux=busca_tabela(comeco_tabela,rotulo)) == NULL) {
 					if (comeco_tabela == NULL)
-						comeco_tabela = ultimo_fila = add_tab_simbolos(rotulo, false, true, 0);
+						comeco_tabela = ultimo_fila = add_tab_simbolos(rotulo, false, true, 1);
 					else {
-						ultimo_fila->prox = add_tab_simbolos(rotulo, false, true, 0);
+						ultimo_fila->prox = add_tab_simbolos(rotulo, false, true, 1);
 						ultimo_fila = ultimo_fila->prox;
 					}
 				}
+				/*RÛtulo redefinido*/
 				else
-					relata_erros(217, opr1, NULL);
+					relata_erros(216, opr1, NULL);
 			}
 		}
 
-		/*Ou j√° est√° na se√ß√£o data*/
+		/*Ou j· est· na seÁ„o data*/
 		else if (section == 2) {
+
+			/*Nenhuma instruÁ„o pode vir aqui dentro*/
+			if (*instr != '\0')
+				relata_erros(213, dir, NULL);
 
 			if (!strcmp(dir, "const")) {
 				if (*rotulo != '\0') {
@@ -189,8 +203,9 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 							ultimo_fila = ultimo_fila->prox;
 						}
 					}
+					/*RÛtulo redefinido*/
 					else
-						relata_erros(217, opr1, NULL);
+						relata_erros(216, opr1, NULL);
 				}
 			}
 
@@ -204,21 +219,19 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 							ultimo_fila = ultimo_fila->prox;
 						}
 					}
+					/*RÛtulo redefinido*/
 					else
-						relata_erros(217, opr1, NULL);
+						relata_erros(216, opr1, NULL);
 				}
 			}
-
-			else
-				relata_erros(214, dir, instr);
 		}
 
-		/*Tem alguma coisa v√°lida (n√£o pre-processada) v√°lida? n√£o consigo pensar em nada */
+		/*Tem alguma coisa v·lida (n„o pre-processada) que pÛde vir fora das seÁıes data e text? n„o consigo pensar em nada */
 		else {
 			if (*instr == '\0')
-				relata_erros(214, instr, NULL);
+				relata_erros(213, instr, NULL);
 			else
-				relata_erros(215, dir, NULL);
+				relata_erros(214, dir, NULL);
 		}
 	}
 
@@ -239,23 +252,22 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 		/*Separa as instrucoes e vai contando os erros encontrados*/
 		separa_linha(linha, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
 
-		/*Entrando na se√ß√£o text*/
+		/*Entrando na seÁ„o text*/
 		if (!strcmp("section", dir) && !strcmp("text", opr1))
 			section = 1;
 
-		/*Ou j√° est√° na se√ß√£o text*/
+		/*Ou j· est· na seÁ„o text*/
 		else if (section == 1) {
 
 			/*Sem erros de diretivas para identificar nessa passagem*/
 			if (*dir != '\0')
 				continue;
 
-			/*Se n√£o achar o argumento na tabela, deu ruim*/
-			aux = busca_tabela(comeco_tabela, opr1);
-			if (aux == NULL)
+			/*Se n„o achar o argumento na tabela, deu ruim*/
+			if ((aux = busca_tabela(comeco_tabela, opr1)) == NULL)
 				relata_erros(300, opr1, NULL);
 
-			/*Proibo pulo para rotulos na se√ß√£o data*/
+			/*Proibo pulo para rotulos na seÁ„o data*/
 			else if ((!strcmp(instr, "jmp") || !strcmp(instr, "jmpp") || !strcmp(instr, "jmpn")) && !aux->executavel )
 				relata_erros(302, aux->rotulo, NULL);
 
@@ -263,7 +275,7 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 			else if ((mod1<0) || (mod1>=aux->tamanho))
 				relata_erros(304, aux->rotulo, NULL);
 
-			/*Proibo alterar o valor de uma vari√°vel constante*/
+			/*Proibo alterar o valor de uma vari·vel constante*/
 			else if (!strcmp(instr, "store") && aux->constante)
 				relata_erros(303, aux->rotulo, NULL);
 
@@ -281,137 +293,7 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 	}
 }
 
-/*Faz todo o log de erros.
-
-#100+ s√£o erros de linha de comando
-#200+ s√£o erros l√©xico/sint√°ticos de primeira passagem
-#300+ s√£o erros sem√¢nticos encontrados na segunda passagem
-
-*/
-void relata_erros (int codigo, char *aux, char *aux2) {
-
-	/*Erros de primeira passagem n√£o precisam ser relatados de novo na segunda passagem*/
-	if (passagem > 1 && codigo<=300)
-		return;
-
-	printf (" *** %d) ", line_counter);
-
-	switch (codigo) {
-		case 100:
-			printf (" Falta um codigo fonte.\n");
-			break;
-
-		case 101:
-			printf (" Nao consegui abrir o arquivo de entrada.\n");
-			break;
-
-		case 102:
-			printf (" Nao consegui abrir o arquivo de saida.\n");
-			break;
-
-		case 200:
-			printf ("(Lex) A linha eh muito grande.\n");
-			break;
-
-		case 201:
-			printf ("(Lex) O token '%s' eh muito grande.\n",aux);
-			break;
-
-		case 202:
-			printf ("(Sint) Argumentos demais para a instrucao '%s'.\n", aux);
-			break;
-
-		case 203:
-			printf ("(Sint) Faltam argumentos para a instrucao '%s'.\n", aux);
-			break;
-
-		case 204:
-			printf ("(Lex) O argumento '%s' inv√°lido para a instrucao '%s'.\n", aux, aux2);
-			break;
-
-		case 205:
-			printf ("(Sint/Lex) Falta a separacao dos operandos por virgula.\n");
-			break;
-
-		case 206:
-			printf ("(Sint) Dois rotulos definidos na mesma linha.\n");
-			break;
-
-		case 207:
-			printf ("(Lex) Rotulo '%s' inv√°lido.\n", aux);
-			break;
-
-		case 208:
-			printf ("(Sint/Lex) Falta o simbolo ':' depois do rotulo '%s'.\n", aux);
-			break;
-
-		case 209:
-			printf ("(Sint) Faltam argumentos para a diretiva '%s'.\n", aux);
-			break;
-
-		case 210:
-			printf ("(Sint) Argumentos em excesso para a diretiva '%s'.\n", aux);
-			break;
-
-		case 211:
-			printf ("(Lex) So existem as secoes 'text' e 'data'.\n");
-			break;
-
-		case 212:
-			printf ("(Lex/Sint) A diretiva 'space' soh aceita argumento numerico positivo.\n");
-			break;
-
-		case 213:
-			printf ("(Lex/Sint) A diretiva '%s' soh aceita argumento numerico.\n", aux);
-			break;
-
-		case 214:
-			printf ("(Sem) A instrucao '%s' tem que vir na secao 'text'.\n", aux);
-			break;
-
-		case 215:
-			printf ("(Sem) A diretiva '%s' tem que vir na secao 'data'.\n", aux);
-			break;
-
-		case 216:
-			printf ("(Sint) A diretiva '%s' necessita de um rotulo.\n", aux);
-			break;
-
-		case 217:
-			printf ("(Sem) O rotulo '%s' foi previamente definido.\n", aux);
-			break;
-
-		case 300:
-			printf ("(Sem) O rotulo '%s' nunca foi definido.\n", aux);
-			break;
-
-		case 301:
-			printf ("(Sem) Divisao por zero.\n");
-			break;
-
-		case 302:
-			printf ("(Sem) O rotulo '%s' nao pode ser um alvo de pulo.\n", aux);
-			break;
-
-		case 303:
-			printf ("(Sem) Tentando alterar o valor da constante '%s'.\n", aux);
-			break;
-
-		case 304:
-			printf ("(Sem) A instrucao '%s' tenta acessar um dado fora do vetor.\n", aux);
-			break;
-
-		case 306:
-			printf ("(Sem) O rotulo '%s' nao foi definido.\n", aux);
-			break;
-
-		default:
-			printf ("Erro desconhecido.\n");
-	}
-	error_count++;
-}
-
-/*Abre os arquivos complementando a termina√ß√£o .asm caso o usu√°rio n√£o tenha informado na linha de comando*/
+/*Abre os arquivos complementando a terminaÁ„o .asm caso o usu·rio n„o tenha informado na linha de comando*/
 FILE* open_sourcefile (char *name) {
 
 	FILE *temp;
@@ -429,7 +311,7 @@ FILE* open_sourcefile (char *name) {
 	}
 }
 
-/*Abre os arquivos complementando a termina√ß√£o .o caso o usu√°rio n√£o tenha informado na linha de comando*/
+/*Abre os arquivos complementando a terminaÁ„o .o caso o usu·rio n„o tenha informado na linha de comando*/
 FILE* open_exitfile (char *name) {
 
 	FILE *temp;
@@ -447,15 +329,15 @@ FILE* open_exitfile (char *name) {
 	}
 }
 
-/** L√™ uma linha do arquivo e deixa no buffer a linha lida.
+/** LÍ uma linha do arquivo e deixa no buffer a linha lida.
 
-	* J√° corrige o line_counter
-    * Ignora linha s√≥ com whitespace ou coment√°rios
+	* J· corrige o line_counter
+    * Ignora linha sÛ com whitespace ou coment·rios
     * Ignora whitespace depois de um whitespace
     * Acaba a linha com \0
-    * Transforma mai√∫scula em min√∫scula
+    * Transforma mai˙scula em min˙scula
 
-Retorna true se o arquivo-fonte ainda n√£o acabou
+Retorna true se o arquivo-fonte ainda n„o acabou
 Retorna false se o arquivo-fonte acabar
 */
 bool get_linha (FILE *src, char *buffer){
@@ -463,7 +345,7 @@ bool get_linha (FILE *src, char *buffer){
     int i=0;
     bool in_whitespace = false;
 
-    /*Ignora o whitespace e coment√°rios at√© um caractere v√°lido*/
+    /*Ignora o whitespace e coment·rios atÈ um caractere v·lido*/
     for ( c=fgetc(src) ; c==' ' || c=='\t' || c=='\n' || c==';' || c=='\r' ; c=fgetc(src) ) {
 
         /*Fim de linha tem que aumentar o contador de linha*/
@@ -472,7 +354,7 @@ bool get_linha (FILE *src, char *buffer){
 			continue;
 		}
 
-        /*Em caso de coment√°rio, v√° at√© o fim dele*/
+        /*Em caso de coment·rio, v· atÈ o fim dele*/
         if (c == ';') {
 			ignora_linha (src);
 			line_counter++;
@@ -480,14 +362,14 @@ bool get_linha (FILE *src, char *buffer){
         }
     }
 
-	/*Se acabou o arquivo e nada de v√°lido foi encontrado retorna falso*/
+	/*Se acabou o arquivo e nada de v·lido foi encontrado retorna falso*/
     if (feof(src))
         return false;
 
-    /*Se cheguei aqui tem algo de valor na linha. Vai copiando a linha at√© ela ou o arquivo acabar.*/
+    /*Se cheguei aqui tem algo de valor na linha. Vai copiando a linha atÈ ela ou o arquivo acabar.*/
     for (line_counter++; c !='\n' && !feof(src); c = fgetc(src) ) {
 
-		/*Se j√° estivermos em whitespace, nao precisa adicionar mais whitespace*/
+		/*Se j· estivermos em whitespace, nao precisa adicionar mais whitespace*/
         if (c == ' ' || c == '\t' || c == '\r') {
 			if (in_whitespace == false ){
 				in_whitespace = true;
@@ -497,13 +379,13 @@ bool get_linha (FILE *src, char *buffer){
 		}
 		in_whitespace = false;
 
-		/*Se for coment√°rio ignore o resto da linha*/
+		/*Se for coment·rio ignore o resto da linha*/
         if (c == ';') {
             ignora_linha(src);
 			break;
         }
 
-		/*Copiando o token e passando de mai√∫scula para minuscula*/
+		/*Copiando o token e passando de mai˙scula para minuscula*/
         if (c >= 'A' && c<= 'Z')
 			buffer[i++] = c + 32;
 		else
@@ -511,7 +393,7 @@ bool get_linha (FILE *src, char *buffer){
 
         /*reporta erro de linha muito grande*/
         if (i >= linesize) {
-            relata_erros(100, NULL, NULL);
+            relata_erros(200, NULL, NULL);
             ignora_linha(src);
             i--;
             break;
@@ -519,7 +401,7 @@ bool get_linha (FILE *src, char *buffer){
     }
     buffer[i] = '\0';
 
-	/*Apagando um poss√≠vel espa√ßo desnecess√°rio no fim da linha*/
+	/*Apagando um possÌvel espaÁo desnecess·rio no fim da linha*/
     if (buffer[i-1]==' ')
 		buffer[i-1] ='\0';
 	return true;
@@ -527,7 +409,7 @@ bool get_linha (FILE *src, char *buffer){
 
 /** Dada uma linha inteira, ele separa o primeiro token e coloca no 'token' e deixa o resto da linha em 'linha'
 
-Retorna true se a linha n√£o recebeu uma linha vazia
+Retorna true se a linha n„o recebeu uma linha vazia
 Retorna false se recebeu uma linha vazia
 */
 bool get_token (char *linha, char *token) {
@@ -554,9 +436,11 @@ bool get_token (char *linha, char *token) {
     for (*token = *linha; !fim_token(linha[i]); i++) {
 		if (i < tokensize)									/*Enquanto a linha estiver pequena vai copiando*/
 			token[i] = linha[i];
+
+		/*caso o token seja muito grande*/
 		else {
 			token[tokensize -1] = '\0';
-			relata_erros(101, token, NULL);
+			relata_erros(201, token, NULL);
 			break;
 		}
     }
@@ -570,14 +454,14 @@ bool get_token (char *linha, char *token) {
 	return true;
 }
 
-/** L√™ o arquivo at√© o fim da linha ou fim do arquivo e retorna*/
+/** LÍ o arquivo atÈ o fim da linha ou fim do arquivo e retorna*/
 void ignora_linha (FILE *src) {
 	while (fgetc(src) != '\n' && !feof(src))
 		;
 	return;
 }
 
-/** True se o caractere est√° na lista dos finalizadores de token false se nao*/
+/** True se o caractere est· na lista dos finalizadores de token false se nao*/
 bool fim_token (char c) {
 	char finalizadores[] = {'\0', ' ', '\t', '.', ',', '(' , ')' , ':', '+'};
 	int i;
@@ -590,11 +474,11 @@ bool fim_token (char c) {
 bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr1, int *mod1, char *opr2, int *mod2) {
 	char aux[tokensize];
 
-	/*Se n√£o tiver nada pode retornar 1 que nao tem erros*/
+	/*Se n„o tiver nada pode retornar 1 que nao tem erros*/
 	if (!get_token(buffer, aux))
 		return true;
 
-	/*Op√ß√£o 1: eh instr. STOP (0), COPY (2) E O RESTO (1)*/
+	/*OpÁ„o 1: eh instr. STOP (0), COPY (2) E O RESTO (1)*/
 	if (eh_instr(aux)) {
 
 		/*Copia o aux para o campo instr*/
@@ -605,68 +489,66 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 
 			/*Se tiver mais alguma coisa na linha eh erro de argumentos demais!*/
 			if (get_token(buffer, aux)) {
-				relata_erros(102, instr, NULL);
+				relata_erros(202, instr, NULL);
 				return false;
 			}
 			return true;
 		}
 
-		/*Todos as outras opera√ß√µes tem que ter pelo menos um operando*/
+		/*Todos as outras operaÁıes tem que ter pelo menos um operando*/
 		else if (!get_token(buffer, opr1)) {
-			relata_erros(103, instr, NULL);
+			relata_erros(203, instr, NULL);
 			return false;
 		}
 
-		/*Se o argumento nao for rotulo v√°lido, erro l√©xico*/
+		/*Se o argumento nao for rotulo v·lido, erro lÈxico*/
 		else if (!rotulo_valido(opr1)){
-			relata_erros(104, opr1, instr);
+			relata_erros(204, opr1, instr);
 			*opr1 = '\0';
 		}
 
-		/*Chegou aqui ent√£o eh uma instru√ß√£o (diferente de stop) e o primeiro argumento eh v√°lido*/
+		/*Chegou aqui ent„o eh uma instruÁ„o (diferente de stop) e o primeiro argumento eh v·lido*/
 
-		/*Se tiver um modificador, anoto. Se n√£o tiver, t√° de boa tb*/
+		/*Se tiver um modificador, anoto. Se n„o tiver, t· de boa tb*/
 		if (eh_modificador_valido(buffer)) {
-			get_token(buffer, aux);
+			get_token(buffer, aux);				/*pega o '+' ou '-'*/
 
-			if (*aux == '+'){
-				get_token(buffer, aux);
-				*mod1 = converte_int(aux);
-			}
+			if (*aux == '-' )
+				relata_erros(212, instr, NULL);
 			else {
-				get_token(buffer, aux);
-				*mod1 = -1*converte_int(aux);
+				get_token(buffer, aux);				/*pega o numero*/
+				*mod1 = converte_int(aux);
 			}
 		}
 
 		/*Se for copy, tem que pegar mais um operando!*/
 		if (!strcmp(instr, "copy")) {
 
-			/*Tem que ter dois tokens para puxar, um pra ser a v√≠rgula e outro o opr2*/
+			/*Tem que ter dois tokens para puxar, um pra ser a vÌrgula e outro o opr2*/
 			if (!get_token(buffer, aux)) {
-				relata_erros(103, "copy", NULL);
+				relata_erros(203, "copy", NULL);
 				return false;
 			}
 
-			/*Se n√£o for a v√≠rgula, reclame e pe√ßa a v√≠rgula*/
+			/*Se n„o for a vÌrgula, reclame e peÁa a vÌrgula*/
 			else if (*aux != ',') {
-				relata_erros(105, NULL, NULL);
+				relata_erros(205, NULL, NULL);
 
 				if (get_token(buffer, aux))
-					relata_erros(102, instr, NULL);
+					relata_erros(202, instr, NULL);
 
 				return false;
 			}
 
-			/*Se faltar o segundo argumento, t√° errado*/
+			/*Se faltar o segundo argumento, t· errado*/
 			else if(!get_token(buffer, opr2)) {
-				relata_erros(103, "copy", NULL);
+				relata_erros(203, "copy", NULL);
 				return false;
 			}
 
-			/*Se nao for rotulo v√°lido, erro l√©xico*/
+			/*Se nao for rotulo v·lido, erro lÈxico*/
 			else if (!rotulo_valido(opr2)){
-				relata_erros(104, opr2, instr);
+				relata_erros(204, opr2, instr);
 				*opr2 = '\0';
 				return false;
 			}
@@ -675,10 +557,8 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 			else if (eh_modificador_valido(buffer)) {
 				get_token(buffer, aux);
 
-				if (*aux == '+'){
-					get_token(buffer, aux);
-					*mod2 = converte_int(aux);
-				}
+				if (*aux == '-')
+					relata_erros (212, instr, NULL);
 				else {
 					get_token(buffer, aux);
 					*mod2 = -1*converte_int(aux);
@@ -688,7 +568,7 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 
 		/*Se tiver mais alguma coisa para buscar na linha, eh erro!*/
 		if (get_token(buffer, aux)) {
-			relata_erros (102, instr, NULL);
+			relata_erros (202, instr, NULL);
 			return false;
 		}
 
@@ -698,20 +578,20 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 /* section (1), public (1), begin(0), end(0), extern(0), space(mod), const(mod) */
 	else if (eh_diretiva(aux)) {
 
-		/*OK, descobri a diretiva. Agora tem que separar os poss√≠veis argumentos*/
+		/*OK, descobri a diretiva. Agora tem que separar os possÌveis argumentos*/
 		strcpy(dir, aux);
 
 		if (!strcmp(dir, "section")) {
 
-			/*Tenta pegar o operador, se n√£o tiver nada na linha eh erro de falta de argumentos*/
+			/*Tenta pegar o operador, se n„o tiver nada na linha eh erro de falta de argumentos*/
 			if (!get_token(buffer, opr1)){
-				relata_erros(109, dir, NULL);
+				relata_erros(209, dir, NULL);
 				return false;
 			}
 
-			/*Se n√£o for text ou data, a se√ß√£o n√£o √© reconhecida pelas regras do roteiro*/
+			/*Se n„o for text ou data, a seÁ„o n„o È reconhecida pelas regras do roteiro*/
 			else if (strcmp(opr1, "text") && strcmp(opr1, "data")) {
-				relata_erros(111, dir, NULL);
+				relata_erros(211, dir, NULL);
 				return false;
 			}
 		}
@@ -727,17 +607,17 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 					/*Se o valor do modificador for negativo, tenho que parar o programador*/
 					if (*mod1 <= 0) {
 						*mod1 = 1;
-						relata_erros(112, NULL, NULL);
+						relata_erros(212, dir, NULL);
 						return false;
 					}
 				}
 				else {
-					relata_erros(112, NULL, NULL);
+					relata_erros(212, dir, NULL);
 					return false;
 				}
 			}
 			else {
-				/*Se n√£o tiver, pode voltar que t√° de boa */
+				/*Se n„o tiver, pode voltar que t· de boa */
 				*mod1 = 1;
 				return true;
 			}
@@ -747,59 +627,49 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 
 			/*Precisa de um 'argumento'*/
 			if (!get_token(buffer, aux)) {
-				relata_erros(109, dir, NULL);
+				relata_erros(209, dir, NULL);
 				return false;
 			}
 
-			/*Se o argumento no for num√©rico, teste se pelo menos eh porque o usu√°rio botou -algo*/
+			/*Se o argumento no for numÈrico deu ruim*/
 			if (eh_num(aux))
 				*mod1 = converte_int(aux);
-			else if (*aux == '-') {
-				get_token(buffer, aux);
-
-				if (eh_num(aux))
-					*mod1 = -1*converte_int(aux);
-				else {
-					relata_erros(113, dir, NULL);
-					return false;
-				}
-			}
 			else {
-				relata_erros(113, dir, NULL);
+				relata_erros(209, dir, NULL);
 				return false;
 			}
 		}
 
 		/*Se tiver mais alguma coisa na linha, tem que identificar como erro*/
 		if (get_token(buffer, aux)) {
-			relata_erros(110, dir, NULL);
+			relata_erros(210, dir, NULL);
 			return false;
 		}
 
 		return true;
 	}
 
-	/*Se n√£o for instru√ß√£o ou diretiva, s√≥ pode ser rotulo.
+	/*Se n„o for instruÁ„o ou diretiva, sÛ pode ser rotulo.
 	Vou fazer de forma recursiva:
-		nao tem rotulo na linha: separa o rotulo e chama a fun√ß√£o de novo (com o rotulo marcado)
+		nao tem rotulo na linha: separa o rotulo e chama a funÁ„o de novo (com o rotulo marcado)
 		tem rotulo: rotulo foi definido em uma chamada anterior e estamos fazendo de novo!
 
-	O objetivo eh identificar a situa√ß√£o 'rotulo1: rotulo2: instr ...' */
+	O objetivo eh identificar a situaÁ„o 'rotulo1: rotulo2: instr ...' */
 
-	/*Tentando definir um segundo r√≥tulo em uma linha!*/
+	/*Tentando definir um segundo rÛtulo em uma linha!*/
 	if (*rotulo != '\0') {
-		relata_erros(106, NULL, NULL);
+		relata_erros(206, NULL, NULL);
 		return false + 0*separa_linha (buffer, rotulo, instr, dir, opr1, mod1, opr2, mod2);;
 	}
 
-	/*Se o rotulo n√£o for v√°lido, erro l√©xico!*/
+	/*Se o rotulo n„o for v·lido, erro lÈxico!*/
 	else if (!rotulo_valido(aux)){
-		relata_erros(107, aux, NULL);
+		relata_erros(207, aux, NULL);
 		strcpy(rotulo, aux);
 		return false + 0*separa_linha (buffer, rotulo, instr, dir, opr1, mod1, opr2, mod2);;
 	}
 
-	/*N√£o aceite modificadores para os r√≥tulos*/
+	/*N„o aceite modificadores para os rÛtulos*/
 	else if (eh_modificador_valido(buffer)) {
 		get_token(buffer, opr1);
 		get_token(buffer, opr2);
@@ -809,30 +679,30 @@ bool separa_linha (char *buffer, char *rotulo, char *instr, char *dir, char *opr
 		strcpy(rotulo, aux);
 		*opr1 = *opr2 = '\0';
 
-		relata_erros(107, aux, NULL);
+		relata_erros(207, aux, NULL);
 
 		if (*buffer != ':')
-			relata_erros(108, aux, NULL);
+			relata_erros(208, aux, NULL);
 		else
 			get_token(buffer, aux);
 
 		return 0*separa_linha (buffer, rotulo, instr, dir, opr1, mod1, opr2, mod2);;
 	}
 
-	/*Erro de defini√ß√£o do r√≥tulo! Faltou o ':'*/
+	/*Erro de definiÁ„o do rÛtulo! Faltou o ':'*/
 	else if (*buffer != ':') {
-		relata_erros(108, aux, NULL);
+		relata_erros(208, aux, NULL);
 		strcpy(rotulo, aux);
 		return 0*separa_linha (buffer, rotulo, instr, dir, opr1, mod1, opr2, mod2);;
 	}
 
-	/*Separo o rotulo do resto linha e chamo a fun√ß√£o novamente*/
+	/*Separo o rotulo do resto linha e chamo a funÁ„o novamente*/
 	strcpy(rotulo, aux);
 	get_token(buffer, aux);
 	return separa_linha (buffer, rotulo, instr, dir, opr1, mod1, opr2, mod2);
 }
 
-/** Retorna true se o token recebido for uma das instru√ß√µes definidas no roteiro*/
+/** Retorna true se o token recebido for uma das instruÁıes definidas no roteiro*/
 bool eh_instr (char *token) {
 
 	return !strcmp(token,"add")
@@ -875,7 +745,7 @@ bool eh_num (char *token) {
 			return false;
 		}
 
-	/*Se n√£o for hexadecimal*/
+	/*Se n„o for hexadecimal*/
 	else
 		for (aux = token; *aux != '\0'; aux++) {
 			if (*aux >= '0'&&*aux<='9')
@@ -902,7 +772,7 @@ bool rotulo_valido (char *token) {
 	return true;
 }
 
-/** Verifico se no buffer os tokens √†s seguir s√£o opera√ß√£o e numero */
+/** Verifico se no buffer os tokens ‡s seguir s„o operaÁ„o e numero */
 bool eh_modificador_valido (char *buffer) {
 	char buffer_local[linesize], num[tokensize], op[tokensize];
 	strcpy(buffer_local, buffer);
@@ -915,7 +785,7 @@ int converte_int (char *token) {
 	char *aux;
 	int cont=0, mult=1;
 
-	/*Vai at√© o √∫ltimo caractere*/
+	/*Vai atÈ o ˙ltimo caractere*/
 	for (aux = token; *aux != '\0'; aux++)
 		;
 	aux--;
@@ -930,7 +800,7 @@ int converte_int (char *token) {
 		}
 		return cont;
 	}
-	/*Se n√£o for hexadecimal*/
+	/*Se n„o for hexadecimal*/
 	for (;aux != token-1; aux--, mult *=10)
 		cont += (*aux - '0')*mult;
 	return cont;
@@ -939,7 +809,7 @@ int converte_int (char *token) {
 SYMBOL_TABLE* add_tab_simbolos (char *rotulo, bool eh_constante, bool eh_executavel, int tamanho) {
 	SYMBOL_TABLE *novo;
 
-	/*Alocando a mem√≥ria*/
+	/*Alocando a memÛria*/
 	novo = malloc (sizeof(SYMBOL_TABLE));
 	novo->rotulo = malloc(strlen(rotulo)+1);
 
@@ -997,7 +867,7 @@ int tam_instr (char *instr, int mod1, char *dir){
 	else if (!strcmp(dir, "space"))
 		return mod1;
 
-	/*Aqui s√£o os casos de diretivas fora space, const*/
+	/*Aqui s„o os casos de diretivas fora space, const*/
 	else if (*instr != '\0')
 		return 2;
 
@@ -1009,7 +879,7 @@ void sintese (FILE *entrada, FILE *saida, SYMBOL_TABLE *comeco_fila ) {
 	/*Buffer*/
 	char linha[linesize];
 
-	/*Partes da instru√ß√£o*/
+	/*Partes da instruÁ„o*/
 	char rotulo[tokensize], instr[8], dir[8], opr1[tokensize], opr2[tokensize];
 	int mod1, mod2;
 
@@ -1023,16 +893,16 @@ void sintese (FILE *entrada, FILE *saida, SYMBOL_TABLE *comeco_fila ) {
 		*rotulo = *instr = *dir = *opr1 = *opr2 = '\0';
 		mod1 = mod2 = 0;
 
-		/*Separa as instrucoes e nao precisa contar os erros, j√° contei eles uma vez*/
+		/*Separa as instrucoes e nao precisa contar os erros, j· contei eles uma vez*/
 		separa_linha(linha, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
 
-		/*Entra na se√ß√£o text*/
+		/*Entra na seÁ„o text*/
 		if (section == 0 && !strcmp("section", dir) && !strcmp("text", opr1)){
 			section = 1;
 			continue;
 		}
 
-		/*Ou se√ß√£o text */
+		/*Ou seÁ„o text */
 		else if (section == 1) {
 
 			/*Chegamos na secao data*/
@@ -1041,7 +911,7 @@ void sintese (FILE *entrada, FILE *saida, SYMBOL_TABLE *comeco_fila ) {
 				continue;
 			}
 
-			/*Diretiva n√£o gera c√≥digo*/
+			/*Diretiva n„o gera cÛdigo*/
 			if (*dir != '\0')
 				continue;
 
@@ -1051,11 +921,11 @@ void sintese (FILE *entrada, FILE *saida, SYMBOL_TABLE *comeco_fila ) {
 				fprintf (saida, "%d ", help);
 			}
 
-			/*Se for stop, n√£o tem argumentos*/
+			/*Se for stop, n„o tem argumentos*/
 			if (!strcmp(instr, "stop"))
 				continue;
 
-			/*Qualquer outra op√ß√£o precisa de pelo menos um argumento*/
+			/*Qualquer outra opÁ„o precisa de pelo menos um argumento*/
 			aux = busca_tabela(comeco_fila, opr1);
 			fprintf (saida, "%d ", (aux->endereco)+mod1);
 
@@ -1116,7 +986,7 @@ void pre_processamento (FILE *entrada) {
 	/*Buffer*/
 	char linha[linesize];
 
-	/*Partes da instru√ß√£o*/
+	/*Partes da instruÁ„o*/
 	char rotulo[tokensize], instr[8], dir[8], opr1[tokensize], opr2[tokensize];
 	int mod1, mod2;
 
@@ -1126,57 +996,134 @@ void pre_processamento (FILE *entrada) {
 		*rotulo = *instr = *dir = *opr1 = *opr2 = '\0';
 		mod1 = mod2 = 0;
 
-		/*Separa as instrucoes e nao precisa contar os erros, j√° contei eles uma vez*/
+		/*Separa as instrucoes e nao precisa contar os erros, j· contei eles uma vez*/
 		separa_linha(linha, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
 
-		/*Entra na se√ß√£o text*/
-		if (section == 0 && !strcmp("section", dir) && !strcmp("text", opr1)){
-			section = 1;
-			continue;
-		}
-
-		/*Ou se√ß√£o text */
-		else if (section == 1) {
-
-			/*Chegamos na secao data*/
-			if (!strcmp(dir, "section") && !strcmp(opr1, "data")){
-				section = 2;
-				continue;
-			}
-
-			/*Diretiva n√£o gera c√≥digo*/
-			if (*dir != '\0')
-				continue;
-
-			/*Primeira coisa: opcode da instrucao*/
-			if (*instr != '\0') {
-				help = retorna_opcode(instr);
-				fprintf (saida, "%d ", help);
-			}
-
-			/*Se for stop, n√£o tem argumentos*/
-			if (!strcmp(instr, "stop"))
-				continue;
-
-			/*Qualquer outra op√ß√£o precisa de pelo menos um argumento*/
-			aux = busca_tabela(comeco_fila, opr1);
-			fprintf (saida, "%d ", (aux->endereco)+mod1);
-
-			if (!strcmp(instr, "copy")){
-				aux = busca_tabela(comeco_fila, opr2);
-				fprintf (saida, "%d ", aux->endereco+mod2);
-			}
-		}
-
-		else if (section == 2) {
-
-			if (!strcmp(dir, "space"))
-				for (;mod1>0; mod1--)
-					fprintf (saida, "0 ");
-			else if (!strcmp(dir, "const"))
-				fprintf (saida, "%d ", mod1);
-		}
 	}
+}
 
-	return 0;
+/*Faz todo o log de erros.
+
+#100+ s„o erros de linha de comando
+#200+ s„o erros lÈxico/sint·ticos de primeira passagem
+#300+ s„o erros sem‚nticos encontrados na segunda passagem
+
+*/
+void relata_erros (int codigo, char *aux, char *aux2) {
+
+	/*Erros de primeira passagem n„o precisam ser relatados de novo na segunda passagem*/
+	if (passagem > 1 && codigo<300)
+		return;
+
+	printf (" *** %d) ", line_counter);
+
+	switch (codigo) {
+		case 100:
+			printf (" Falta um codigo fonte.\n");
+			break;
+
+		case 101:
+			printf (" Nao consegui abrir o arquivo de entrada.\n");
+			break;
+
+		case 102:
+			printf (" Nao consegui abrir o arquivo de saida.\n");
+			break;
+
+		case 200:
+			printf ("(Lex) A linha eh muito grande.\n");
+			break;
+
+		case 201:
+			printf ("(Lex) O token '%s' eh muito grande.\n",aux);
+			break;
+
+		case 202:
+			printf ("(Sint) Argumentos demais para a instrucao '%s'.\n", aux);
+			break;
+
+		case 203:
+			printf ("(Sint) Faltam argumentos para a instrucao '%s'.\n", aux);
+			break;
+
+		case 204:
+			printf ("(Lex) O argumento '%s' inv·lido para a instrucao '%s'.\n", aux, aux2);
+			break;
+
+		case 205:
+			printf ("(Sint/Lex) Falta a separacao dos operandos por virgula.\n");
+			break;
+
+		case 206:
+			printf ("(Sint) Dois rotulos definidos na mesma linha.\n");
+			break;
+
+		case 207:
+			printf ("(Lex) Rotulo '%s' inv·lido.\n", aux);
+			break;
+
+		case 208:
+			printf ("(Sint/Lex) Falta o simbolo ':' depois do rotulo '%s'.\n", aux);
+			break;
+
+		case 209:
+			printf ("(Sint) Faltam argumentos para a diretiva '%s'.\n", aux);
+			break;
+
+		case 210:
+			printf ("(Sint) Argumentos em excesso para a diretiva '%s'.\n", aux);
+			break;
+
+		case 211:
+			printf ("(Lex) So existem as secoes 'text' e 'data'.\n");
+			break;
+
+		case 212:
+			printf ("(Lex/Sint) A diretiva '%s' soh aceita argumento numerico positivo.\n", aux);
+			break;
+
+		case 213:
+			printf ("(Sem) A instrucao '%s' tem que vir na secao 'text'.\n", aux);
+			break;
+
+		case 214:
+			printf ("(Sem) A diretiva '%s' tem que vir na secao 'data'.\n", aux);
+			break;
+
+		case 215:
+			printf ("(Sint) A diretiva '%s' necessita de um rotulo.\n", aux);
+			break;
+
+		case 216:
+			printf ("(Sem) O rotulo '%s' foi previamente definido.\n", aux);
+			break;
+
+		case 300:
+			printf ("(Sem) O rotulo '%s' nunca foi definido.\n", aux);
+			break;
+
+		case 301:
+			printf ("(Sem) Divisao por zero.\n");
+			break;
+
+		case 302:
+			printf ("(Sem) O rotulo '%s' nao pode ser um alvo de pulo.\n", aux);
+			break;
+
+		case 303:
+			printf ("(Sem) Tentando alterar o valor da constante '%s'.\n", aux);
+			break;
+
+		case 304:
+			printf ("(Sem) A instrucao '%s' tenta acessar um dado fora do vetor.\n", aux);
+			break;
+
+		case 306:
+			printf ("(Sem) O rotulo '%s' nao foi definido.\n", aux);
+			break;
+
+		default:
+			printf ("Erro desconhecido.\n");
+	}
+	error_count++;
 }
