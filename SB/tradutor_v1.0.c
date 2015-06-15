@@ -90,7 +90,9 @@ int main (int argc,char *argv[]) {
 	*/
 
 	/*entrada = fopen("ArquivosTeste/dir.asm", "r");*/
-	entrada = fopen("ArquivosTeste/instr.asm", "r");
+	/*entrada = fopen("ArquivosTeste/instr.asm", "r");*/
+	/*entrada = fopen("ArquivosTeste/rot.asm", "r");*/
+	entrada = fopen("ArquivosTeste/vetores.asm", "r");
 
 	analise(entrada, comeco_tabela);
 
@@ -154,6 +156,16 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 
 		/*Separa os tokens encontrados nas caixinhas certas*/
 		separa_linha(linha, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
+
+		if (debug_mode1 == true && comeco_tabela != NULL){
+			printf ("Tabela de simbolos\n");
+			printf ("Rotulo\t\tEndereco\tTamanho\t\tConstante\tExecutvel\n");
+			for (aux = comeco_tabela; aux != NULL; aux = aux->prox)
+				printf ("'%s'\t\t'%d'\t\t'%d'\t\t'%d'\t\t'%d'\n", aux->rotulo, aux->endereco, aux->tamanho, aux->constante, aux->executavel);
+
+			printf ("\n\n");
+			getchar();
+		}
 
 		/*Entrando na seção text*/
 		if (!strcmp("section", dir) && !strcmp("text", opr1))
@@ -263,17 +275,33 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 			if (*dir != '\0')
 				continue;
 
+			/*Stop não tem argumentos para se preocupar*/
+			else if (!strcmp("stop", instr))
+				continue;
+
 			/*Se não achar o argumento na tabela, deu ruim*/
-			if ((aux = busca_tabela(comeco_tabela, opr1)) == NULL)
-				relata_erros(300, opr1, NULL);
+			else if ((aux = busca_tabela(comeco_tabela, opr1)) == NULL){
+
+				/*Pode ser que o usuário não tenha informado um argumento, aí o programa iria reclamar que o rotulo '' não foi definido...*/
+				if (*opr1 != '\0')
+					relata_erros(300, opr1, NULL);
+			}
 
 			/*Proibo pulo para rotulos na seção data*/
 			else if ((!strcmp(instr, "jmp") || !strcmp(instr, "jmpp") || !strcmp(instr, "jmpn")) && !aux->executavel )
 				relata_erros(302, aux->rotulo, NULL);
 
 			/*Proibo acesso a dados fora do vetor*/
-			else if ((mod1<0) || (mod1>=aux->tamanho))
-				relata_erros(304, aux->rotulo, NULL);
+			else if ((mod1<0) || (mod1>=aux->tamanho)){
+
+				/*Se for um rotulo da seção de dados eu trato como vetor*/
+				if (!aux->executavel)
+					relata_erros(304, aux->rotulo, NULL);
+
+				/*Se for da seção de texto eu trato diferente*/
+				else
+					relata_erros(307, NULL, NULL);
+			}
 
 			/*Proibo alterar o valor de uma variável constante*/
 			else if (!strcmp(instr, "store") && aux->constante)
@@ -281,9 +309,12 @@ void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela ) {
 
 			/*COPY tem que verificar o segundo argumento*/
 			else if (!strcmp(instr, "copy")){
-				aux = busca_tabela(comeco_tabela, opr2);
-				if (aux == NULL)
-					relata_erros(300, opr2, NULL);
+
+				if ((aux = busca_tabela(comeco_tabela, opr2)) == NULL){
+
+					if (*opr2 != '\0')
+						relata_erros(300, opr2, NULL);
+				}
 
 				/*Proibo acesso a dados fora do vetor*/
 				else if ((mod1<0) || (mod1>=aux->tamanho))
@@ -1047,7 +1078,7 @@ void relata_erros (int codigo, char *aux, char *aux2) {
 			break;
 
 		case 204:
-			printf ("(Lex) O argumento '%s' inválido para a instrucao '%s'.\n", aux, aux2);
+			printf ("(Lex) O argumento '%s' invalido para a instrucao '%s'.\n", aux, aux2);
 			break;
 
 		case 205:
@@ -1059,7 +1090,7 @@ void relata_erros (int codigo, char *aux, char *aux2) {
 			break;
 
 		case 207:
-			printf ("(Lex) Rotulo '%s' inválido.\n", aux);
+			printf ("(Lex) Rotulo '%s' invalido.\n", aux);
 			break;
 
 		case 208:
@@ -1120,6 +1151,10 @@ void relata_erros (int codigo, char *aux, char *aux2) {
 
 		case 306:
 			printf ("(Sem) O rotulo '%s' nao foi definido.\n", aux);
+			break;
+
+		case 307:
+			printf ("(Sem) Labels dentro da secao texto nao podem ser usadas como vetores.\n");
 			break;
 
 		default:
