@@ -80,7 +80,6 @@ add dword [numEntrada], ebx
 
 inc esi
 
-
 loop loop_soma
 
 
