@@ -1,8 +1,0 @@
-
-section text 
-load dois 
-add 5 
-section data 
-dois : const 4 
-dez : const 5 
-
