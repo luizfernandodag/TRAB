@@ -1,7 +1,7 @@
 /*Retorna true se processou equ e false se não processou equ.
 Se ele processar equ, pode ser que tenha algum outro equ para processar depois
 */
-void processa_equ (char *src_name) {
+void processa_equ (char *src_name, char *dst_name) {
 
 	char linha[linesize];
 	char buff1[tokensize], buff2[tokensize], buff3[tokensize], buff4[tokensize];
@@ -9,9 +9,9 @@ void processa_equ (char *src_name) {
 	FILE *entrada, *saida;
 
 	/*Copiando o arquivo de entrada para a saída temporária*/
-	copy_file (src_name, PREPROCESSED_FILE);
+	copy_file (src_name, dst_name);
 
-	entrada = fopen (PREPROCESSED_FILE, "r");
+	entrada = fopen (dst_name, "r");
 
 	/*pego uma linha*/
 	while (get_linha(entrada, linha) == true) {
@@ -59,8 +59,8 @@ void processa_equ (char *src_name) {
 				fclose(saida);
 
 				/*Saida vira entrada para testar outro equ*/
-				copy_file(TEMP_OUTPUT,PREPROCESSED_FILE);
-				entrada = fopen(PREPROCESSED_FILE, "r");
+				copy_file(TEMP_OUTPUT,dst_name);
+				entrada = fopen(dst_name, "r");
 				remove(TEMP_OUTPUT);
 		}
 		/*O que mais pode vir antes da seção texto?

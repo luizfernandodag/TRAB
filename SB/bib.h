@@ -9,9 +9,9 @@
 #define linesize		312		/* tkn + " : COPY " + tkn + " , " + tkn + '\0'*/
 
 /*Caso o usuário não informe o nome que ele quer para o arquivo de saida*/
-#define DEFAULT_OUTPUT_NAME		"default.asm"
+#define DEFAULT_OUTPUT_NAME		"arquivo.s"
 #define TEMP_OUTPUT				"temp.asm"
-#define PREPROCESSED_FILE		"prep.txt"
+#define PREPROCESSED_FILE		"prep.asm"
 
 /*************************************** DEFINIÇÕES TABELAS E ESTRUTURAS DE DADOS *****************************************/
 typedef struct SYMBOL_TABLE_CELL SYMBOL_TABLE;
@@ -31,7 +31,7 @@ struct SYMBOL_TABLE_CELL {
 /*ALTO NÍVEL*/
 bool valida_linhacomando (int argc, char **argv);
 bool abre_arquivos (int argc, char *argv[], FILE *entrada, FILE *saida);
-void pre_processamento (char *entrada);
+void pre_processamento (char *entrada, char *saida);
 void analise (FILE *entrada, SYMBOL_TABLE *comeco_tabela);
 void sintese (FILE *entrada, FILE *saida, SYMBOL_TABLE *comeco_fila);
 void relata_erros (int codigo, char *aux, char *aux2);
@@ -41,7 +41,7 @@ FILE* open_sourcefile (char *name);
 FILE* open_exitfile (char *name);
 
 /*Pre-processamento*/
-void processa_equ (char *src_name);
+void processa_equ (char *src_name, char *dst_name);
 void processa_if (FILE *entrada, FILE *saida);
 
 /*Scanner*/
@@ -63,6 +63,25 @@ SYMBOL_TABLE* add_tab_simbolos (char *rotulo, bool eh_constante, bool eh_executa
 void apaga_tab_simbolos (SYMBOL_TABLE *prim);
 bool tem_tabela_simbolos (SYMBOL_TABLE *prim, char *alvo);
 SYMBOL_TABLE* busca_tabela (SYMBOL_TABLE *prim, char *alvo);
+
+/*Tradução IA-32*/
+void traduzADD(FILE *arquivo, char **args, int numArgs);
+void traduzSUB(FILE *arquivo, char **args, int numArgs);
+void traduzMULT(FILE *arquivo, char **args, int numArgs);
+void traduzDIV(FILE *arquivo, char **args, int numArgs);
+void traduzJMP(FILE *arquivo, char **args, int numArgs);
+void traduzJMPN(FILE *arquivo, char **args, int numArgs);
+void traduzJMPP(FILE *arquivo, char **args, int numArgs);
+void traduzJMPZ(FILE *arquivo, char **args, int numArgs);
+void traduzCOPY(FILE *arquivo, char **args, int numArgs);
+void traduzLOAD(FILE *arquivo, char **args, int numArgs);
+void traduzSTORE(FILE *arquivo, char **args, int numArgs);
+void traduzINPUT(FILE *arquivo, char **args, int numArgs);
+void traduzOUTPUT(FILE *arquivo, char **args, int numArgs);
+void traduzCONST(FILE *arquivo, char **args, int numArgs);
+void traduzSPACE(FILE *arquivo, char **args, int numArgs);
+void escreveFuncaoEscreverInteiro(FILE * arq);
+void escreveFuncaoLerInteiro(FILE * arq);
 
 /*Outros*/
 int converte_int (char *token);
@@ -318,9 +337,9 @@ bool copy_file (char *src, char *dst) {
 	return true;
 }
 
-void pre_processamento(char *entrada){
+void pre_processamento(char *entrada, char *saida){
 
-    processa_equ(entrada);
+    processa_equ(entrada, saida);
 
     /*Saída eh PREPROCESSED_FILE*/
 	/*processa_if*/
