@@ -1,172 +1,100 @@
-#include <stdio.h>
-#include <stdlib.h>
 
-
-void traduzADD(FILE *arquivo, char **args, int numArgs)
-{
+void traduzADD(FILE *dst, char *arg1, int numArgs) {
 
 	if(numArgs == 1)
+		fprintf(dst,"\nADD EAX, [%s]", args[0] );
+
+	else if(numArgs == 2)
 	{
-		fprintf(arquivo,"\nADD EAX, [%s]", args[0] );
+		int offset =  (int)strtol(args[1], NULL, 0);
+		fprintf(dst, "\nADD EAX, DWORD [%s + %d]", args[0], 4*offset );
+
+	}
+}
+
+void traduzSUB(FILE *dst, char *arg1, int numArgs) {
+	if(numArgs == 1)
+		fprintf(dst,"\nSUB EAX,  DWORD [%s]", args[0] );
+	else if(numArgs == 2)
+	{
+		int offset =  (int)strtol(args[1], NULL, 0);
+		fprintf(dst, "\nSUB EAX, DWORD [%s + %d]", args[0], 4*offset );
+
+	}
+}
+
+void traduzMULT(FILE *dst, char *arg1, int numArgs) {
+	if(numArgs == 1)
+	{
+		fprintf(dst,"\nMUL DWORD [%s]", args[0] );
 
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\nADD EAX, DWORD [%s + %d]", args[0], 4*offset );
+		fprintf(dst, "\nMUL DWORD [%s + %d]", args[0], 4*offset );
 
 	}
-	else
-	{
-		printf("Erro sintantico instrucao ADD: numero de argumentos errado\n");
-	}
-
 }
 
-void traduzSUB(FILE *arquivo, char **args, int numArgs)
-{
+void traduzDIV(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nSUB EAX,  DWORD [%s]", args[0] );
-
-	}
-	else if(numArgs == 2)
-	{
-		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\nSUB EAX, DWORD [%s + %d]", args[0], 4*offset );
-
-	}
-	else
-	{
-		printf("Erro sintantico instrucao SUB: numero de argumentos errado\n");
-	}
-
-	
-}
-
-void traduzMULT(FILE *arquivo, char **args, int numArgs)
-{
-	if(numArgs == 1)
-	{
-		fprintf(arquivo,"\nMUL DWORD [%s]", args[0] );
-
-	}
-	else if(numArgs == 2)
-	{
-		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\nMUL DWORD [%s + %d]", args[0], 4*offset );
-
-	}
-	else
-	{
-		printf("Erro sintantico instrucao MUL: numero de argumentos errado\n");
-	}
-
-	
-}
-
-void traduzDIV(FILE *arquivo, char **args, int numArgs)
-{
-	if(numArgs == 1)
-	{
+<<<<<<< HEAD:SB/traducao.c
 		fprintf(arquivo,"\nCDQ [%s]", args[0] );//CDQ extende o sinal de EAX para EDX
 		fprintf(arquivo,"\nDIV DWORD [%s]", args[0] );
+=======
+		fprintf(dst,"\nDIV DWORD [%s]", args[0] );
+>>>>>>> c9a3d73edd1e315786ebb5e7bd7014e253d4c4d2:SB/Bibliotecas/traducaoIA32.h
 
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\nDIV DWORD [%s + %d]", args[0], 4*offset );
+		fprintf(dst, "\nDIV DWORD [%s + %d]", args[0], 4*offset );
 
 	}
-	else
-	{
-		printf("Erro sintantico instrucao DIV: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzJMP(FILE *arquivo, char **args, int numArgs)
-{
+void traduzJMP(FILE *dst, char *arg1, int numArgs) {
 
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nJMP %s ", args[0] );
+		fprintf(dst,"\nJMP %s ", args[0] );
 
 	}
-	else if(numArgs == 2)
-	{
-		printf("Erro sintantico instrucao jmp: numero de argumentos errado\n");		
-	}
-	else
-	{
-		printf("Erro sintantico instrucao jmp: numero de argumentos errado\n");
-	}
-	
-	
 }
 
-void traduzJMPN(FILE *arquivo, char **args, int numArgs)
-{
+void traduzJMPN(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nCMP EAX, 0" );
-		fprintf(arquivo,"\nJB %s ", args[0] );//JMP LABEL
+		fprintf(dst,"\nCMP EAX, 0" );
+		fprintf(dst,"\nJB %s ", args[0] );/*JMP LABEL*/
 
 	}
-	else if(numArgs == 2)
-	{
-		printf("Erro sintantico instrucao jmpn: numero de argumentos errado\n");	
-	}
-	else
-	{
-		printf("Erro sintantico instrucao jmpn: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzJMPP(FILE *arquivo, char **args, int numArgs)
-{
+void traduzJMPP(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nCMP EAX, 0" );
-		fprintf(arquivo,"\nJA %s ", args[0] );//JMP LABEL
+		fprintf(dst,"\nCMP EAX, 0" );
+		fprintf(dst,"\nJA %s ", args[0] );/*JMP LABEL*/
 
 	}
-	else if(numArgs == 2)
-	{
-		printf("Erro sintantico instrucao jmpp: numero de argumentos errado\n");	
-	}
-	else
-	{
-		printf("Erro sintantico instrucao jmpp: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzJMPZ(FILE *arquivo, char **args, int numArgs)
-{
+void traduzJMPZ(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nCMP EAX, 0" );
-		fprintf(arquivo,"\nJE %s ", args[0] );//JMP LABEL
+		fprintf(dst,"\nCMP EAX, 0" );
+		fprintf(dst,"\nJE %s ", args[0] );/*JMP LABEL*/
 
 	}
-	else if(numArgs == 2)
-	{
-		printf("Erro sintantico instrucao jmpz: numero de argumentos errado\n");	
-	}
-	else
-	{
-		printf("Erro sintantico instrucao jmpz: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzCOPY(FILE *arquivo, char **args, int numArgs)
-{
+void traduzCOPY(FILE *dst, char *arg1, int numArgs) {
 	/*
-	a funcao copy deve ter pelo menos 2 argumentos 
+	a funcao copy deve ter pelo menos 2 argumentos
 	ARG1 = args[0]
 	OFFSET1 = args[1]
 	ARG2 = args[2]
@@ -175,109 +103,81 @@ void traduzCOPY(FILE *arquivo, char **args, int numArgs)
 	*/
 
 
-	if(numArgs != 4)
-	{
-		printf("Erro sintantico instrucao COPY: numero de argumentos errado\n");
-
-	}
-	else
-	{
+	if(numArgs == 4) {
 		int offset2 = (int)strtol(args[3], NULL, 0);
 		int offset1 = (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo,"\nPUSH EBX");
-		fprintf(arquivo,"\nMOV EBX, DWORD [%s + %d]", args[2], 4*offset2);
-		fprintf(arquivo,"\nMOV DWORD [%s + %d],  EBX ", args[0], 4*offset1 );
-		fprintf(arquivo,"\nPOP EBX");
-
-
+		fprintf(dst,"\nPUSH EBX");
+		fprintf(dst,"\nMOV EBX, DWORD [%s + %d]", args[2], 4*offset2);
+		fprintf(dst,"\nMOV DWORD [%s + %d],  EBX ", args[0], 4*offset1 );
+		fprintf(dst,"\nPOP EBX");
 	}
-	
+
 }
 
-void traduzLOAD(FILE *arquivo, char **args, int numArgs)
-{
+void traduzLOAD(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nMOV EAX, [%s]", args[0] );
+		fprintf(dst,"\nMOV EAX, [%s]", args[0] );
 
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\nMOV EAX, DWORD [%s + %d]", args[0], 4*offset );
+		fprintf(dst, "\nMOV EAX, DWORD [%s + %d]", args[0], 4*offset );
 
 	}
-	else
-	{
-		printf("Erro sintantico instrucao load: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzSTORE(FILE *arquivo, char **args, int numArgs)
-{
+void traduzSTORE(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nMOV DWORD [%s], EAX", args[0] );
+		fprintf(dst,"\nMOV DWORD [%s], EAX", args[0] );
 
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\nMOV DWORD [%s + %d], EAX", args[0], 4*offset );
+		fprintf(dst, "\nMOV DWORD [%s + %d], EAX", args[0], 4*offset );
 
 	}
-	else
-	{
-		printf("Erro sintantico instrucao load: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzINPUT(FILE *arquivo, char **args, int numArgs)
-{/*
+void traduzINPUT(FILE *dst, char *arg1, int numArgs) {/*
 	Para essa funcao funcionar, eh necessario que o procedimento lerInteiro
-	e as variaveis 
+	e as variaveis
 					section .bss
 					leitura: resb 11
 					numEntrada: resd 1
 
 					section .data
 					dez dd 10
-	tenham sido definidas 				
+	tenham sido definidas
 	*/
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nCALL lerInteiro" );
-		fprintf(arquivo,"\nPUSH  EDX" );
-		fprintf(arquivo,"\nMOV EDX, DWORD [numEntrada]" );
-		fprintf(arquivo,"\nMOV DWORD [%s], EDX", args[0] );
-		fprintf(arquivo,"\nPOP EDX" );
+		fprintf(dst,"\nCALL lerInteiro" );
+		fprintf(dst,"\nPUSH  EDX" );
+		fprintf(dst,"\nMOV EDX, DWORD [numEntrada]" );
+		fprintf(dst,"\nMOV DWORD [%s], EDX", args[0] );
+		fprintf(dst,"\nPOP EDX" );
 
 
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo,"\nCALL lerInteiro" );
-		fprintf(arquivo,"\nPUSH  EDX" );
-		fprintf(arquivo,"\nMOV EDX, DWORD [numEntrada]" );
-		fprintf(arquivo,"\nMOV DWORD [%s + %d], EDX", args[0], 4*offset );
-		fprintf(arquivo,"\nPOP EDX" );
+		fprintf(dst,"\nCALL lerInteiro" );
+		fprintf(dst,"\nPUSH  EDX" );
+		fprintf(dst,"\nMOV EDX, DWORD [numEntrada]" );
+		fprintf(dst,"\nMOV DWORD [%s + %d], EDX", args[0], 4*offset );
+		fprintf(dst,"\nPOP EDX" );
 
 	}
-	else
-	{
-		printf("Erro sintantico instrucao input: numero de argumentos errado\n");
-	}
-	
 }
 
-
-void traduzOUTPUT(FILE *arquivo, char **args, int numArgs)
-{
+void traduzOUTPUT(FILE *dst, char *arg1, int numArgs) {
 	/*Para essa funcao funcionar, eh necessario que o procedimento escreverInteiro
-	e as variaveis 
+	e as variaveis
 					section .bss
 					numSaida: resd 1
 					numSaidaStringAux: resb 11
@@ -285,101 +185,55 @@ void traduzOUTPUT(FILE *arquivo, char **args, int numArgs)
 
 					section .data
 					dez dd 10
-	tenham sido definidas 				
+	tenham sido definidas
 	*/
 	if(numArgs == 1)
 	{
-		fprintf(arquivo,"\nPUSH  EDX" );
-		fprintf(arquivo,"\nMOV EDX, DWORD [%s]",args[0] );
-		fprintf(arquivo,"\nMOV DWORD [numSaida], EDX" );
-		fprintf(arquivo,"\nCALL escreverInteiro" );
-		fprintf(arquivo,"\nPOP EDX" );
+		fprintf(dst,"\nPUSH  EDX" );
+		fprintf(dst,"\nMOV EDX, DWORD [%s]",args[0] );
+		fprintf(dst,"\nMOV DWORD [numSaida], EDX" );
+		fprintf(dst,"\nCALL escreverInteiro" );
+		fprintf(dst,"\nPOP EDX" );
 
 
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo,"\nPUSH  EDX" );
-		fprintf(arquivo,"\nMOV EDX, DWORD [%s + %d]",args[0], 4*offset);
-		fprintf(arquivo,"\nMOV DWORD [numSaida], EDX" );
-		fprintf(arquivo,"\nCALL escreverInteiro" );
-		fprintf(arquivo,"\nPOP EDX" );
+		fprintf(dst,"\nPUSH  EDX" );
+		fprintf(dst,"\nMOV EDX, DWORD [%s + %d]",args[0], 4*offset);
+		fprintf(dst,"\nMOV DWORD [numSaida], EDX" );
+		fprintf(dst,"\nCALL escreverInteiro" );
+		fprintf(dst,"\nPOP EDX" );
 	}
-	else
-	{
-		printf("Erro sintantico instrucao input: numero de argumentos errado\n");
-	}
-	
 }
 
-void traduzCONST(FILE *arquivo, char **args, int numArgs)
-{
+void traduzCONST(FILE *dst, char *arg1, int numArgs) {
+	if(numArgs == 2)
+	{
+		int offset =  (int)strtol(args[1], NULL, 0);
+		fprintf(dst, "\n%s dd %d", args[0], offset );
+
+
+	}
+}
+
+void traduzSPACE(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
-		printf("Erro diretiva const\n");
-		
+		fprintf(dst, "\n%s RESD 1", args[0] );
+
 	}
 	else if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\n%s dd %d", args[0], offset );
+		fprintf(dst, "\n%s RESD %d", args[0], offset );
 
 
 	}
-	else
-	{
-		printf("Erro diretiva const\n");
-	}
-	
 }
 
-
-void traduzSPACE(FILE *arquivo, char **args, int numArgs)
-{
-	if(numArgs == 1)
-	{
-		fprintf(arquivo, "\n%s RESD 1", args[0] );
-		
-	}
-	else if(numArgs == 2)
-	{
-		int offset =  (int)strtol(args[1], NULL, 0);
-		fprintf(arquivo, "\n%s RESD %d", args[0], offset );
-
-
-	}
-	else
-	{
-		printf("Erro diretiva space\n");
-	}
-	
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void escreveFuncaoEscreverInteiro(FILE * arq)
-{
+void escreveFuncaoEscreverInteiro(FILE * arq) {
 	fprintf(arq, "%s","\nescreverInteiro:\n");
 fprintf(arq, "%s","enter 0,0\n");
 fprintf(arq, "%s","push eax\n");
@@ -440,16 +294,14 @@ fprintf(arq, "%s","pop edx\n");
 fprintf(arq, "%s","pop ecx\n");
 fprintf(arq, "%s","pop ebx\n");
 fprintf(arq, "%s","pop eax\n");
-fprintf(arq, "%s","leave\n"); 
+fprintf(arq, "%s","leave\n");
 fprintf(arq, "%s","ret\n");
 
 
 }
 
-
-//Funcao para escrever no arquivo do assembly ia32 a funcao lerInteiro
-void escreveFuncaoLerInteiro(FILE * arq)
-{
+/*Funcao para escrever no dst do assembly ia32 a funcao lerInteiro*/
+void escreveFuncaoLerInteiro(FILE * arq) {
 
 fprintf(arq, "%s","\nLerInteiro:\n");
 fprintf(arq, "%s","\nenter 0, 0");
@@ -498,11 +350,11 @@ fprintf(arq, "%s","\npop ecx");
 fprintf(arq, "%s","\npop ebx");
 fprintf(arq, "%s","\npop eax");
 fprintf(arq, "%s","\nleave");
-fprintf(arq, "%s","\nret\n"); 
+fprintf(arq, "%s","\nret\n");
 }
 
 
-
+/*
 int main()
 {
 FILE * arq = fopen("teste.txt", "w");
@@ -545,3 +397,4 @@ escreveFuncaoEscreverInteiro(arq);
 fclose(arq);
 return 0;
 }
+*/
