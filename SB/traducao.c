@@ -69,6 +69,7 @@ void traduzDIV(FILE *arquivo, char **args, int numArgs)
 {
 	if(numArgs == 1)
 	{
+		fprintf(arquivo,"\nCDQ [%s]", args[0] );//CDQ extende o sinal de EAX para EDX
 		fprintf(arquivo,"\nDIV DWORD [%s]", args[0] );
 
 	}
