@@ -1,5 +1,5 @@
 
-void traduzADD(FILE *dst, char **args, int numArgs) {
+void traduzADD(FILE *dst, char *arg1, int numArgs) {
 
 	if(numArgs == 1)
 		fprintf(dst,"\nADD EAX, [%s]", args[0] );
@@ -12,7 +12,7 @@ void traduzADD(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzSUB(FILE *dst, char **args, int numArgs) {
+void traduzSUB(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 		fprintf(dst,"\nSUB EAX,  DWORD [%s]", args[0] );
 	else if(numArgs == 2)
@@ -23,7 +23,7 @@ void traduzSUB(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzMULT(FILE *dst, char **args, int numArgs) {
+void traduzMULT(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nMUL DWORD [%s]", args[0] );
@@ -37,7 +37,7 @@ void traduzMULT(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzDIV(FILE *dst, char **args, int numArgs) {
+void traduzDIV(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nDIV DWORD [%s]", args[0] );
@@ -51,7 +51,7 @@ void traduzDIV(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzJMP(FILE *dst, char **args, int numArgs) {
+void traduzJMP(FILE *dst, char *arg1, int numArgs) {
 
 	if(numArgs == 1)
 	{
@@ -60,7 +60,7 @@ void traduzJMP(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzJMPN(FILE *dst, char **args, int numArgs) {
+void traduzJMPN(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nCMP EAX, 0" );
@@ -69,7 +69,7 @@ void traduzJMPN(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzJMPP(FILE *dst, char **args, int numArgs) {
+void traduzJMPP(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nCMP EAX, 0" );
@@ -78,7 +78,7 @@ void traduzJMPP(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzJMPZ(FILE *dst, char **args, int numArgs) {
+void traduzJMPZ(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nCMP EAX, 0" );
@@ -87,7 +87,7 @@ void traduzJMPZ(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzCOPY(FILE *dst, char **args, int numArgs) {
+void traduzCOPY(FILE *dst, char *arg1, int numArgs) {
 	/*
 	a funcao copy deve ter pelo menos 2 argumentos
 	ARG1 = args[0]
@@ -109,7 +109,7 @@ void traduzCOPY(FILE *dst, char **args, int numArgs) {
 
 }
 
-void traduzLOAD(FILE *dst, char **args, int numArgs) {
+void traduzLOAD(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nMOV EAX, [%s]", args[0] );
@@ -123,7 +123,7 @@ void traduzLOAD(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzSTORE(FILE *dst, char **args, int numArgs) {
+void traduzSTORE(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst,"\nMOV DWORD [%s], EAX", args[0] );
@@ -137,7 +137,7 @@ void traduzSTORE(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzINPUT(FILE *dst, char **args, int numArgs) {/*
+void traduzINPUT(FILE *dst, char *arg1, int numArgs) {/*
 	Para essa funcao funcionar, eh necessario que o procedimento lerInteiro
 	e as variaveis
 					section .bss
@@ -170,7 +170,7 @@ void traduzINPUT(FILE *dst, char **args, int numArgs) {/*
 	}
 }
 
-void traduzOUTPUT(FILE *dst, char **args, int numArgs) {
+void traduzOUTPUT(FILE *dst, char *arg1, int numArgs) {
 	/*Para essa funcao funcionar, eh necessario que o procedimento escreverInteiro
 	e as variaveis
 					section .bss
@@ -203,7 +203,7 @@ void traduzOUTPUT(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzCONST(FILE *dst, char **args, int numArgs) {
+void traduzCONST(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 2)
 	{
 		int offset =  (int)strtol(args[1], NULL, 0);
@@ -213,7 +213,7 @@ void traduzCONST(FILE *dst, char **args, int numArgs) {
 	}
 }
 
-void traduzSPACE(FILE *dst, char **args, int numArgs) {
+void traduzSPACE(FILE *dst, char *arg1, int numArgs) {
 	if(numArgs == 1)
 	{
 		fprintf(dst, "\n%s RESD 1", args[0] );

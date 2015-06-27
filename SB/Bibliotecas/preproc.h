@@ -1,3 +1,13 @@
+
+void pre_processamento(char *entrada, char *saida){
+
+    processa_equ(entrada, saida);
+    processa_if(saida, TEMP_OUTPUT);
+
+    copy_file(TEMP_OUTPUT, saida);
+    remove(TEMP_OUTPUT);
+}
+
 /*Retorna true se processou equ e false se não processou equ.
 Se ele processar equ, pode ser que tenha algum outro equ para processar depois
 */
