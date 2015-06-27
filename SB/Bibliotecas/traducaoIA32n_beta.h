@@ -74,11 +74,11 @@ void traduzSECTION (FILE *dst, char *arg1){
 }
 
 void traduzCONST(FILE *dst, char *rotulo, int constante) {
-	fprintf(dst, "\n%s: dd %d\n", rotulo, constante );
+	fprintf(dst, "\n%s: dd %d", rotulo, constante );
 }
 
 void traduzSPACE(FILE *dst, char *rotulo, int quantidade) {
-	fprintf(dst, "\n%s dd 0\n", rotulo);
+	fprintf(dst, "\n%s dd 0", rotulo);
 
 	while (--quantidade>0)
 		fprintf (dst, ", 0");
@@ -152,7 +152,7 @@ void escreveFuncaoEscreverInteiro(FILE * arq) {
 void escreveFuncaoLerInteiro(FILE * arq) {
 
 	fprintf(arq, "\n\nsection code");
-	fprintf(arq, "%s","\nLerInteiro:\n");
+	fprintf(arq, "%s","\nlerInteiro:\n");
 	fprintf(arq, "%s","\nenter 0, 0");
 	fprintf(arq, "%s","\npush eax");
 	fprintf(arq, "%s","\npush ebx");

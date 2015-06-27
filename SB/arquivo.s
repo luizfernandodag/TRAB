@@ -2,6 +2,8 @@ global _start
 
 section text
 
+_start:
+
 CALL lerInteiro
 PUSH  EDX
 MOV EDX, DWORD [numEntrada]
@@ -34,17 +36,13 @@ int 80h
 
 section data
 
- dd 0
-
- dd 0
-
- dd 0
-
-: dd 2
-
+b dd 0
+h dd 0
+r dd 0
+dois: dd 2
 
 section code
-LerInteiro:
+lerInteiro:
 
 enter 0, 0
 push eax
@@ -129,3 +127,11 @@ pop ebx
 pop eax
 leave
 ret
+
+section data
+numEntrada dd 0
+leitura dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+numSaida dd 0
+dez dd 10
+numSaidaString dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+numSaidaStringAux dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0

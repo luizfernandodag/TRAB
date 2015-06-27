@@ -114,17 +114,17 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 			traduzSECTION(dst, opr1);
 
 			/*Definindo o global start*/
-			if (globalstart_defined==false && !strcmp(opr1, "code")) {
+			if (globalstart_defined==false && !strcmp(opr1, "text")) {
 				fprintf (dst, "\n_start:\n");
 				globalstart_defined = true;
 			}
 		}
 
 		else if (!strcmp(dir, "space"))
-			traduzSPACE(dst, opr1, mod1);
+			traduzSPACE(dst, rotulo, mod1);
 
 		else if (!strcmp(dir, "const"))
-			traduzCONST(dst, opr1, mod1);
+			traduzCONST(dst, rotulo, mod1);
 	}
 
 	/*Adicionando as bibliotecas ao arquivo executável*/
@@ -134,6 +134,16 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 
 	if (usa_output)
 		escreveFuncaoEscreverInteiro(dst);
+
+	if (usa_input || usa_output) {
+		fprintf (dst, "\nsection data");
+		fprintf (dst, "\nnumEntrada dd 0");
+		fprintf (dst, "\nleitura dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+		fprintf (dst, "\nnumSaida dd 0");
+		fprintf (dst, "\ndez dd 10");
+		fprintf (dst, "\nnumSaidaString dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+		fprintf (dst, "\nnumSaidaStringAux dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0\n");
+	}
 
 	fclose(src);
 	fclose(dst);
