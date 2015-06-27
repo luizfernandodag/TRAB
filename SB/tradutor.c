@@ -103,7 +103,7 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 		}
 
 		else if (!strcmp(instr, "output")){
-			traduzINPUT(dst, opr1, mod1);
+			traduzOUTPUT(dst, opr1, mod1);
 			usa_output = true;
 		}
 
