@@ -68,9 +68,9 @@ void traduzSTOP (FILE *dst) {
 
 void traduzSECTION (FILE *dst, char *arg1){
 	if (!strcmp(arg1, "data"))
-		fprintf (dst, "\nsection .data\n");
+		fprintf (dst, "\nsection data\n");
 	else
-		fprintf (dst, "\nsection .text\n");
+		fprintf (dst, "\nsection text\n");
 }
 
 void traduzCONST(FILE *dst, char *rotulo, int constante) {

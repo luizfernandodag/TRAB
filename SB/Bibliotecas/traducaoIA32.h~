@@ -142,14 +142,6 @@ void traduzSTORE(FILE *dst, char *arg1, int numArgs) {
 	}
 }
 
-void traduzSECTION (FILE *dst, char *arg1){
-	if (!strcmp(arg1, "data"))
-		fprintf (dst, "\nsection .data\n");
-	else
-		fprintf (dst, "\nsection .text\n");
-}
-
-
 void traduzINPUT(FILE *dst, char *arg1, int numArgs) {/*
 	Para essa funcao funcionar, eh necessario que o procedimento lerInteiro
 	e as variaveis
@@ -186,7 +178,7 @@ void traduzINPUT(FILE *dst, char *arg1, int numArgs) {/*
 void traduzOUTPUT(FILE *dst, char *arg1, int numArgs) {
 	/*Para essa funcao funcionar, eh necessario que o procedimento escreverInteiro
 	e as variaveis
-					 .bss
+					section .bss
 					numSaida: resd 1
 					numSaidaStringAux: resb 11
 					numSaidaString resb 11

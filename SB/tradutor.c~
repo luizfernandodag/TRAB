@@ -77,7 +77,7 @@ escreveFuncaoLerInteiro(dst);
 		mod1 = mod2 = 0;
 
 		separa_linha(buffer, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
-printf("rotulo = %s instr = %s dir = %s \n", rotulo,  instr, dir );
+printf("instr = %s \n", instr);
 		if (!strcmp(instr, "add") || !strcmp(instr, "ADD"))
 			traduzADD(dst, opr1, mod1);
 
