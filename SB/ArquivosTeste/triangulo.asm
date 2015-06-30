@@ -1,12 +1,12 @@
 ; comentário
 SECTION TEXT
-;		INPUT		B
-;		INPUT		H
+		INPUT		B
+		INPUT		H
 		LOAD		B
 		MULT		H
 		DIV		DOIS
 		STORE		R
-;		OUTPUT	R
+		OUTPUT		R
 		STOP
 
 SECTION DATA

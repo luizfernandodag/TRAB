@@ -32,6 +32,7 @@ struct SYMBOL_TABLE_CELL {
 bool valida_linhacomando (int argc, char **argv);
 void pre_processamento (char *entrada, char *saida);
 void analise (char *src_name, SYMBOL_TABLE *comeco_tabela);
+void sintese_linguagem (char *src_name, char *dst_name);
 void relata_erros (int codigo, char *aux, char *aux2);
 
 /*Pre-processamento*/
@@ -94,3 +95,6 @@ int line_counter = 0;
 int mem_counter = 0;
 int section = 0;
 bool tem_codigo = false;
+bool usa_input = false;
+bool usa_output = false;
+bool globalstart_defined = false;
