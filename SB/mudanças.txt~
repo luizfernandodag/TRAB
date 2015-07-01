@@ -1,0 +1,16 @@
+Mudanças
+
+-> Na função escrever inteiro, adicionei um enter no fim para seguir o roteiro.
+
+-> Tava testando outro codigo e percebi uma coisa interessante: o usuário não pode utilizar as
+variáveis que a gente usou para o código do lerinteiro e escrever inteiro. Na maioria dos casos,
+de boas, mas e se o usuario quiser uma variável chamada 'dez'? Ele reclama de duas definições.
+
+	Solução: renomear as variáveis que a gente usa no programa por algo que o usuário não vai usar
+	'dez' -> '_dez_'
+	'leitura' -> '_leitura_'
+	'enter' -> '_enter_'	
+
+-> Tinha um bug ali que eu transformava todos os saltos (positivo, negativo, zero e o normal) em saltos normais
+
+-> Estava esquecendo dos rótulos!

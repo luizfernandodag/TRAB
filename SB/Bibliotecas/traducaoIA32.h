@@ -102,7 +102,7 @@ void escreveFuncaoEscreverInteiro(FILE * arq) {
 	fprintf(arq, "%s","loop1:\n");
 	fprintf(arq, "%s","inc ecx\n");
 	fprintf(arq, "%s","xor edx, edx\n");
-	fprintf(arq, "%s","div dword [dez]\n");
+	fprintf(arq, "%s","div dword [_dez_]\n");
 	fprintf(arq, "%s","cmp eax, 0\n");
 	fprintf(arq, "%s","jle fim\n");
 
@@ -140,6 +140,13 @@ void escreveFuncaoEscreverInteiro(FILE * arq) {
 	fprintf(arq, "%s","mov edx, 11\n");
 	fprintf(arq, "%s","int 80h\n");
 
+/**Adicionei um enter no fim do número aqui*/
+	fprintf (arq, "mov eax, 4\n");
+	fprintf (arq, "mov ebx, 1\n");
+	fprintf (arq, "mov ecx, _enter_\n");
+	fprintf (arq, "mov edx, 2\n");
+	fprintf(arq, "%s","int 80h\n");
+/**/
 	fprintf(arq, "%s","pop edx\n");
 	fprintf(arq, "%s","pop ecx\n");
 	fprintf(arq, "%s","pop ebx\n");
@@ -163,13 +170,13 @@ void escreveFuncaoLerInteiro(FILE * arq) {
 	fprintf(arq, "%s","\n; ler numero");
 	fprintf(arq, "%s","\nmov eax, 3");
 	fprintf(arq, "%s","\nmov ebx, 0");
-	fprintf(arq, "%s","\nmov ecx, leitura");
+	fprintf(arq, "%s","\nmov ecx, _leitura_");
 	fprintf(arq, "%s","\nmov edx, 10");
 	fprintf(arq, "%s","\nint 80h");
 
 	fprintf(arq, "%s","\nmov eax, 0; comecar as posicoes da string");
 	fprintf(arq, "%s","\nmov [numEntrada], DWORD 0; inicializacao do numero de saida");
-	fprintf(arq, "%s","\nmov esi, leitura");
+	fprintf(arq, "%s","\nmov esi, _leitura_");
 
 	fprintf(arq, "%s","\nloop_soma:");
 	fprintf(arq, "%s","\nxor ebx, ebx");
@@ -179,7 +186,7 @@ void escreveFuncaoLerInteiro(FILE * arq) {
 	fprintf(arq, "%s","\nje SAI");
 	fprintf(arq, "%s","\nsub  bl, 0x30; conserta char");
 	fprintf(arq, "%s","\nmov eax, dword [numEntrada]");
-	fprintf(arq, "%s","\nmul dword [dez]");
+	fprintf(arq, "%s","\nmul dword [_dez_]");
 	fprintf(arq, "%s","\nmov dword [numEntrada], eax ");
 	fprintf(arq, "%s","\nadd dword [numEntrada], ebx");
 
@@ -212,7 +219,7 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 	dst = fopen(dst_name, "w");
 
 	/*Esse pedaço é necessário em qualquer arquivo*/
-	fprintf(dst, "global _start\n");
+	fprintf(dst, "global _start");
 
 	while (get_linha(src, buffer)){
 
@@ -221,6 +228,11 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 		mod1 = mod2 = 0;
 
 		separa_linha(buffer, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
+
+		/*Anotando aqui os rótulos no código que eu tava ignorando*/
+		if (*rotulo != '\0' && *dir == '\0'){
+			fprintf (dst, "\n%s: ", rotulo);
+		}
 
 		if (!strcmp(instr, "add") || !strcmp(instr, "ADD"))
 			traduzADD(dst, opr1, mod1);
@@ -238,13 +250,13 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 			traduzJMP(dst, opr1);
 
 		else if (!strcmp(instr, "jmpp") || !strcmp(instr, "JMPP"))
-			traduzJMP(dst, opr1);
+			traduzJMPP(dst, opr1);
 
 		else if (!strcmp(instr, "jmpn") || !strcmp(instr, "JMPN"))
-			traduzJMP(dst, opr1);
+			traduzJMPN(dst, opr1);
 
 		else if (!strcmp(instr, "jmpz") || !strcmp(instr, "JMPZ"))
-			traduzJMP(dst, opr1);
+			traduzJMPZ(dst, opr1);
 
 		else if (!strcmp(instr, "copy") || !strcmp(instr, "COPY"))
 			traduzCOPY(dst, opr1, mod1, opr2, mod2);
@@ -273,7 +285,7 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 
 			/*Definindo o global start*/
 			if (globalstart_defined==false && !strcmp(opr1, "text")) {
-				fprintf (dst, "\n_start:\n");
+				fprintf (dst, "_start:");
 				globalstart_defined = true;
 			}
 		}
@@ -289,10 +301,11 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 
 	if (usa_input || usa_output){
 		fprintf (dst, "\nsection .data");
+		fprintf (dst, "\n_enter_ db 0ah, 0dH");
 		fprintf (dst, "\nnumEntrada dd 0");
-		fprintf (dst, "\nleitura dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+		fprintf (dst, "\n_leitura_ dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0");
 		fprintf (dst, "\nnumSaida dd 0");
-		fprintf (dst, "\ndez dd 10");
+		fprintf (dst, "\n_dez_ dd 10");
 		fprintf (dst, "\nnumSaidaString dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0");
 		fprintf (dst, "\nnumSaidaStringAux dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0\n");
 

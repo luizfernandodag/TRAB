@@ -10,6 +10,7 @@
 
 /*Caso o usuário não informe o nome que ele quer para o arquivo de saida*/
 #define DEFAULT_OUTPUT_NAME		"arquivo.s"
+#define DEFAULT_OUTPUT_CODE		"arquivo.cod"
 #define TEMP_OUTPUT				"temp.asm"
 #define PREPROCESSED_FILE		"prep.asm"
 
