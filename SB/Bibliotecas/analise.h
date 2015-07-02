@@ -1,8 +1,7 @@
 /*Faz a análise do código, procurando por erros e mexendo na variável global que mede erros*/
-void analise (char *src_name, SYMBOL_TABLE *comeco_tabela ) {
+SYMBOL_TABLE* analise (char *src_name) {
 
 	FILE *entrada;
-	entrada = fopen(src_name, "r");
 
 	/*Buffers*/
 	char linha[linesize];
@@ -12,10 +11,11 @@ void analise (char *src_name, SYMBOL_TABLE *comeco_tabela ) {
 	int mod1, mod2;
 
 	/*Tabelas*/
-	SYMBOL_TABLE *ultimo_fila, *aux;
+	SYMBOL_TABLE *comeco_tabela, *ultimo_fila, *aux;
 	comeco_tabela = ultimo_fila = aux = NULL;
 
-	for (; get_linha(entrada, linha) == true ; mem_counter += tam_instr(instr, mod1, dir)) {
+	entrada = fopen(src_name, "r");
+	for (; get_linha(entrada, linha) == true ; mem_counter_code += tam_instr(instr, mod1), mem_counter_data += tam_dir(dir, mod1)) {
 
 		/*Limpa os buffers*/
 		*rotulo = *instr = *dir = *opr1 = *opr2 = '\0';
@@ -183,8 +183,9 @@ void analise (char *src_name, SYMBOL_TABLE *comeco_tabela ) {
 
 	if (tem_codigo == false)
 		relata_erros (216, NULL, NULL);
-
 	fclose(entrada);
+
+	return comeco_tabela;
 }
 
 SYMBOL_TABLE* add_tab_simbolos (char *rotulo, bool eh_constante, bool eh_executavel, int tamanho) {
@@ -196,11 +197,15 @@ SYMBOL_TABLE* add_tab_simbolos (char *rotulo, bool eh_constante, bool eh_executa
 
 	strcpy(novo->rotulo, rotulo);
 
-	novo->endereco = mem_counter;
+	novo->endereco = mem_counter_data;
 	novo->constante = eh_constante;
 	novo->tamanho = tamanho;
 	novo->prox = NULL;
 	novo->executavel = eh_executavel;
+
+	if (eh_executavel)
+		novo->endereco = mem_counter_code;
+
 	return novo;
 }
 
@@ -237,7 +242,7 @@ SYMBOL_TABLE* busca_tabela (SYMBOL_TABLE *prim, char *alvo) {
 	return NULL;
 }
 
-int tam_instr (char *instr, int mod1, char *dir){
+int tam_instr (char *instr, int mod1){
 
 	/*Operações básicas tem 6 bytes*/
 	if (!strcmp(instr, "add")||!strcmp(instr, "sub")||!strcmp(instr, "mult")||!strcmp(instr, "div"))
@@ -267,15 +272,19 @@ int tam_instr (char *instr, int mod1, char *dir){
 	else if (!strcmp(instr, "stop"))
 		return 12;
 
+	return 0;
+}
+
+int tam_dir (char *dir, int mod1){
+
 	/*const precisa de 4 bytes pra guardar o dado*/
-	else if (!strcmp(dir, "const"))
+	if (!strcmp(dir, "const"))
 		return 4;
 
 	/*space precisa de 4* o numero de espaços*/
 	else if (!strcmp(dir, "space"))
 		return 4*mod1;
 
-	/*section retorna 0*/
 	return 0;
 }
 

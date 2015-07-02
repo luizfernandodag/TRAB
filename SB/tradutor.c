@@ -7,9 +7,13 @@
 
 #include "Bibliotecas/traducaoIA32.h"
 
+bool debug1 = false;
+
+void sintese_codigo (char *in_name, char *out_name, SYMBOL_TABLE *comeco_tabela);
+
 int main (int argc,char *argv[]) {
 
-	SYMBOL_TABLE *comeco_tabela=NULL;
+	SYMBOL_TABLE *comeco_tabela=NULL, *aux;
 
 	if (!valida_linhacomando(argc, argv))
 		return 0;
@@ -18,7 +22,13 @@ int main (int argc,char *argv[]) {
 	pre_processamento(argv[1], PREPROCESSED_FILE);
 
 	/*Faz a análise do código já pré-processado*/
-	analise(PREPROCESSED_FILE, comeco_tabela);
+	comeco_tabela = analise(PREPROCESSED_FILE);
+
+	if (debug1){
+		printf ("\n\nRotulo\t\t\tEndereco\n");
+		for (aux=comeco_tabela; aux != NULL; aux = aux->prox)
+			printf ("%s\t\t\t\t%d\n", aux->rotulo, aux->endereco);
+	}
 
 	/*Se encontrar erros nem passa para a próxima fase*/
 	if (error_count > 0){
@@ -37,7 +47,7 @@ int main (int argc,char *argv[]) {
 	return 0;
 }
 
-void sintese_codigo (char *in_name, char *out_name){
+void sintese_codigo (char *in_name, char *out_name, SYMBOL_TABLE *comeco_tabela){
 
 	FILE *in, *dst;
 
@@ -47,6 +57,9 @@ void sintese_codigo (char *in_name, char *out_name){
 	/*Tokens separados*/
 	char rotulo[tokensize], instr[8], dir[8], opr1[tokensize], opr2[tokensize];
 	int mod1, mod2;
+
+	/*Busca na tabela de simbolos*/
+	SYMBOL_TABLE *aux;
 
 	in = fopen(in_name, "r");
 	dst = fopen(out_name, "w+");
@@ -59,20 +72,23 @@ void sintese_codigo (char *in_name, char *out_name){
 
 		separa_linha(buffer, rotulo, instr, dir, opr1, &mod1, opr2, &mod2);
 
+		aux = busca_tabela(comeco_tabela, opr1);
+
 		if (!strcmp(instr, "add") || !strcmp(instr, "ADD"))
-			traduzADD(dst, opr1, mod1);
+			fprintf (dst, "05 03 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "sub") || !strcmp(instr, "SUB"))
-			traduzSUB(dst, opr1, mod1);
+			fprintf (dst, "2B 05 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "mult") || !strcmp(instr, "MULT"))
-			traduzMULT(dst, opr1, mod1);
+			fprintf (dst, "F7 25 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "div") || !strcmp(instr, "DIV"))
-			traduzDIV(dst, opr1, mod1);
+			fprintf (dst, "F7 35 %#010x\n", converte_littleendian(aux->endereco));
 
+/**/
 		else if (!strcmp(instr, "jmp") || !strcmp(instr, "JMP"))
-			traduzJMP(dst, opr1);
+			fprintf (dst, "EB %d\n", mod1);
 
 		else if (!strcmp(instr, "jmpp") || !strcmp(instr, "JMPP"))
 			traduzJMP(dst, opr1);
@@ -83,6 +99,7 @@ void sintese_codigo (char *in_name, char *out_name){
 		else if (!strcmp(instr, "jmpz") || !strcmp(instr, "JMPZ"))
 			traduzJMP(dst, opr1);
 
+/**/
 		else if (!strcmp(instr, "copy") || !strcmp(instr, "COPY"))
 			traduzCOPY(dst, opr1, mod1, opr2, mod2);
 
@@ -146,3 +163,4 @@ void sintese_codigo (char *in_name, char *out_name){
 	fclose(dst);
 
 }
+

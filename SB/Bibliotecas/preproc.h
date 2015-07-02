@@ -88,12 +88,12 @@ void processa_if (char *src_name, char *dst_name) {
 
 	FILE *entrada, *saida;
 
-	entrada = fopen(src_name, "r");
-	saida = fopen(dst_name, "w");
-
 	/*Buffer*/
 	char linha[linesize];
 	char buff1[tokensize], buff2[tokensize];
+
+	entrada = fopen(src_name, "r");
+	saida = fopen(dst_name, "w");
 
 	while (get_linha(entrada, linha) == true) {
 

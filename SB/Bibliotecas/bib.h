@@ -32,7 +32,7 @@ struct SYMBOL_TABLE_CELL {
 /*ALTO NÍVEL*/
 bool valida_linhacomando (int argc, char **argv);
 void pre_processamento (char *entrada, char *saida);
-void analise (char *src_name, SYMBOL_TABLE *comeco_tabela);
+SYMBOL_TABLE* analise (char *src_name);
 void sintese_linguagem (char *src_name, char *dst_name);
 void relata_erros (int codigo, char *aux, char *aux2);
 
@@ -84,16 +84,19 @@ void escreveFuncaoLerInteiro(FILE * arq);
 /*Outros*/
 int converte_int (char *token);					/*Converte uma sequencia de caracteres em 1 número*/
 bool copy_file (char *src, char *dst);			/*Copia um arquivo para outro lugar*/
+int converte_littleendian (int i);				/*Dado um inteiro, escreve o numero */
 
 /*Linguagem*/
-int tam_instr (char *instr, int mod1, char *dir);
+int tam_instr (char *instr, int mod1);
+int tam_dir (char *dir, int mod1);
 int retorna_opcode (char *instr);
 
 /**************************************** VARIÁVEIS GLOBAIS: ESTADO DE EXECUÇÃO *******************************************/
 int error_count = 0;
 int passagem = 1;
 int line_counter = 0;
-int mem_counter = 0;
+int mem_counter_code = 0;
+int mem_counter_data = 0;
 int section = 0;
 bool tem_codigo = false;
 bool usa_input = false;

@@ -51,3 +51,17 @@ bool copy_file (char *src, char *dst) {
 	fclose (output);
 	return true;
 }
+
+/*Recebe um inteiro (32 bits) e retorna o endereço como um endereço em hex
+0xABcdEF01 -> "0x01EFcdAB"
+*/
+int converte_littleendian (int i) {
+
+	int swapped;
+
+	swapped =	((i>>24)&0xff      ) | 	/* move byte 3 to byte 0*/
+				((i<< 8)&0xff0000  ) |	/* move byte 1 to byte 2*/
+				((i>> 8)&0xff00    ) |	/* move byte 2 to byte 1*/
+				((i<<24)&0xff000000);	/* byte 0 to byte 3*/
+	return swapped;
+}

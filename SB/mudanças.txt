@@ -1,5 +1,11 @@
 Mudanças
 
+02/07/2015 (manhã)
+-> Adicionei uma função que escreve um inteiro como um endereço 32 bits em hex em little endian (na biblioteca misc.h)
+
+
+-------------------------------------------------------------------------------
+01/07/2015
 -> Na função escrever inteiro, adicionei um enter no fim para seguir o roteiro.
 
 -> Tava testando outro codigo e percebi uma coisa interessante: o usuário não pode utilizar as
@@ -17,3 +23,7 @@ de boas, mas e se o usuario quiser uma variável chamada 'dez'? Ele reclama de d
 
 -> Pergunta: se a gente não usa sinal, como o professor falou, como diabos o 'jmpn' vai funcionar?
 Sempre ele vai interpretar o negativo como sendo positivo (complemento de dois)
+
+	r: o emanuel falou que pra input/output é sempre positivo, mas durante o programa pode ser negativo
+	isso significa que depois que o código estiver tudo funcionando +- a gente deveria dar um jeito de
+	permitir a possibilidade de sinal
