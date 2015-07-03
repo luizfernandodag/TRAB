@@ -1,124 +1,75 @@
 global _start
 section .text
 _start:
-ADD EAX, DWORD [quatro + 0]
+PUSH EBX
+MOV EBX, DWORD [dois + 0]
+MOV DWORD [ghost + 0],  EBX 
+POP EBX
 
-SUB EAX, DWORD [quatro + 0]
+fim_instr: 
+ADD EAX, DWORD [dois + 0]
 
-MUL DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-DIV DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-JMP meio
+ADD EAX, DWORD [dois + 0]
 
-CMP EAX, 0
-JA meio
+ADD EAX, DWORD [dois + 0]
 
-CMP EAX, 0
-JB meio
+ADD EAX, DWORD [dois + 0]
 
-CMP EAX, 0
-JE meio
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
+ADD EAX, DWORD [dois + 0]
 
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-ADD EAX, DWORD [quatro + 0]
-
-meio: 
+pindamonhangaba: 
 MOV EAX, 1
 MOV EBX, 0
 int 80h
 
 section .data
 
+quatro: dd 4
 ghost dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 dois: dd 2
-quatro: dd 4

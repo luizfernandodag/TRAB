@@ -1,10 +1,5 @@
 Mudanças
 
-03/07/2015 (tarde no linf)
--> Vários códigos funcionando já os do opcode. Faltam alguns lá
--> Acho que eu vou fazer 2 vezes, a primeira para as instruções e a segunda para os dados 
-
-
 02/07/2015 (manhã)
 -> Adicionei uma função que escreve um inteiro como um endereço 32 bits em hex em little endian (na biblioteca misc.h)
 

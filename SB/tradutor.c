@@ -59,12 +59,16 @@ void sintese_codigo (char *in_name, char *out_name, SYMBOL_TABLE *comeco_tabela)
 	int mod1, mod2;
 
 	/*Busca na tabela de simbolos*/
-	SYMBOL_TABLE *aux;
+	SYMBOL_TABLE *aux, *aux2;
 
 	in = fopen(in_name, "r");
 	dst = fopen(out_name, "w+");
 
+	mem_counter_code = mem_counter_data = 0;
 	while (get_linha(in, buffer)){
+
+		mem_counter_code += tam_instr(instr, mod1);
+		mem_counter_data += tam_dir(dir, mod1);
 
 		/*Limpa os buffers*/
 		*rotulo = *instr = *dir = *opr1 = *opr2 = '\0';
@@ -75,68 +79,75 @@ void sintese_codigo (char *in_name, char *out_name, SYMBOL_TABLE *comeco_tabela)
 		aux = busca_tabela(comeco_tabela, opr1);
 
 		if (!strcmp(instr, "add") || !strcmp(instr, "ADD"))
-			fprintf (dst, "05 03 %#010x\n", converte_littleendian(aux->endereco));
+			fprintf (dst, " 03 05 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "sub") || !strcmp(instr, "SUB"))
-			fprintf (dst, "2B 05 %#010x\n", converte_littleendian(aux->endereco));
+			fprintf (dst, " 2B 05 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "mult") || !strcmp(instr, "MULT"))
-			fprintf (dst, "F7 25 %#010x\n", converte_littleendian(aux->endereco));
+			fprintf (dst, " F7 25 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "div") || !strcmp(instr, "DIV"))
-			fprintf (dst, "F7 35 %#010x\n", converte_littleendian(aux->endereco));
+			fprintf (dst, " F7 35 %#010x\n", converte_littleendian(aux->endereco));
 
-/**/
 		else if (!strcmp(instr, "jmp") || !strcmp(instr, "JMP"))
-			fprintf (dst, "EB %d\n", mod1);
+			fprintf (dst, " E9 %#010x\n", converte_littleendian(aux->endereco - mem_counter_code));
 
-		else if (!strcmp(instr, "jmpp") || !strcmp(instr, "JMPP"))
-			traduzJMP(dst, opr1);
+		else if (!strcmp(instr, "jmpp") || !strcmp(instr, "JMPP")){
+			fprintf (dst, "83 F8 00 ");
+			fprintf (dst, " 0F 87 %#010x\n", converte_littleendian(aux->endereco - mem_counter_code));
+		}
 
-		else if (!strcmp(instr, "jmpn") || !strcmp(instr, "JMPN"))
-			traduzJMP(dst, opr1);
+		else if (!strcmp(instr, "jmpn") || !strcmp(instr, "JMPN")){
+			fprintf (dst, "83 F8 00 ");
+			fprintf (dst, " 0F 82 %#010x\n", converte_littleendian(aux->endereco - mem_counter_code));
+		}
 
-		else if (!strcmp(instr, "jmpz") || !strcmp(instr, "JMPZ"))
-			traduzJMP(dst, opr1);
+		else if (!strcmp(instr, "jmpz") || !strcmp(instr, "JMPZ")){
+			fprintf (dst, "83 F8 00 ");
+			fprintf (dst, " 0F 84 %#010x\n", converte_littleendian(aux->endereco - mem_counter_code));
+		}
 
-/**/
-		else if (!strcmp(instr, "copy") || !strcmp(instr, "COPY"))
-			traduzCOPY(dst, opr1, mod1, opr2, mod2);
+		else if (!strcmp(instr, "copy") || !strcmp(instr, "COPY")) {
+			aux2 = busca_tabela(comeco_tabela, opr2);
+
+			fprintf (dst, "53 ");
+			fprintf (dst, "8b 1d ", converte_littleendian(aux->endereco - mem_counter_code));
+			fprintf (dst, "89 1d ", converte_littleendian(aux2->endereco - mem_counter_code));
+			fprintf (dst, "5b");
+		}
 
 		else if (!strcmp(instr, "load") || !strcmp(instr, "LOAD"))
-			traduzLOAD(dst, opr1, mod1);
+			fprintf (dst, "A1 %#010x\n", converte_littleendian(aux->endereco));
 
 		else if (!strcmp(instr, "store") || !strcmp(instr, "STORE"))
-			traduzSTORE(dst, opr1, mod1);
+			;
 
 		else if (!strcmp(instr, "input") || !strcmp(instr, "INPUT")) {
-			traduzINPUT(dst, opr1, mod1);
-			usa_input = true;
+			;
 		}
 
 		else if (!strcmp(instr, "output") || !strcmp(instr, "OUTPUT")){
-			traduzOUTPUT(dst, opr1, mod1);
-			usa_output = true;
+			;
 		}
 
 		else if (!strcmp(instr, "stop") || !strcmp(instr, "STOP"))
-			traduzSTOP(dst);
+			;
 
 		else if (!strcmp(dir, "section") || !strcmp(instr, "SECTION")){
-			traduzSECTION(dst, opr1);
+			;
 
 			/*Definindo o global start*/
 			if (globalstart_defined==false && !strcmp(opr1, "text")) {
-				fprintf (dst, "\n_start:\n");
-				globalstart_defined = true;
+				;
 			}
 		}
 
 		else if (!strcmp(dir, "space"))
-			traduzSPACE(dst, rotulo, mod1);
+			;
 
 		else if (!strcmp(dir, "const"))
-			traduzCONST(dst, rotulo, mod1);
+			;
 	}
 
 	/*Adicionando as bibliotecas ao arquivo executável*/
@@ -151,11 +162,13 @@ void sintese_codigo (char *in_name, char *out_name, SYMBOL_TABLE *comeco_tabela)
 		fprintf (dst, "\nnumSaidaString dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0");
 		fprintf (dst, "\nnumSaidaStringAux dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0\n");
 
-		if (usa_input)
-			escreveFuncaoLerInteiro(dst);
+
+		if (usa_input) {
+			;
+		}
 
 		if (usa_output)
-			escreveFuncaoEscreverInteiro(dst);
+			;
 
 	}
 
