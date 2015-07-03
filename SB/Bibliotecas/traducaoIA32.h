@@ -321,6 +321,201 @@ void sintese_linguagem (char *src_name, char *dst_name) {
 	fclose(dst);
 }
 
+void traduzADDOp(FILE *dst, char *enderecoVariavel) {
+	fprintf(dst, "03 05 %s ", enderecoVariavel );
+}
+
+void traduzSUBOp(FILE *dst, char *enderecoVariavel) {
+	fprintf(dst, "2b 05 %s ", enderecoVariavel );
+}
+
+void traduzMULTOp(FILE *dst, char *enderecoVariavel) {
+	fprintf(dst, "F7 25 %s ", enderecoVariavel );
+}
+
+void traduzDIVOp(FILE *dst, char *enderecoVariavel) {
+	fprintf(dst, "2b 05 %s ", enderecoVariavel );
+}
+
+void traduzCOPYOp(FILE *dst, char *enderecoVariavel1, char *enderecoVariavel2 ) {
+	fprintf(dst, "53 " );
+	fprintf(dst, "8b 1d %s ", enderecoVariavel2);
+	fprintf(dst, "89 1d %s 5b ",enderecoVariavel1 );
+	fprintf(dst, "5b " );
+}
+
+void traduzLOADOp(FILE *dst, char *enderecoVariavel) {
+	fprintf(dst, "a1 %s ", enderecoVariavel );
+}
+
+void traduzStoreOp(FILE *dst, char *enderecoVariavel) {
+	fprintf(dst, "a3 %s ", enderecoVariavel );
+}
+
+void traduzINPUTOp(FILE *dst, char *enderecoFuncaoInput, char * endereconumEntrada char * enderecoVariavel) {
+	fprintf(dst, "e8 %s ", enderecoFuncaoInput );
+	fprintf(dst, "52 ");
+	fprintf(dst, "8b 15  %s ", endereconumEntrada );
+	fprintf(dst, "89 15 %s ", enderecoVariavel );
+	fprintf(dst, "52 ");
+
+}
+
+void traduzOUTPUTOp(FILE *dst, char *enderecoFuncaoOutput, char * endereconumSaida char * enderecoVariavel) {
+	fprintf(dst, "52 ");
+	fprintf(dst, "8b 15  %s ", enderecoVariavel );
+	fprintf(dst, "89 15 %s ", endereconumSaida );
+	fprintf(dst, "52 ");
+	fprintf(dst, "e8 %s ", enderecoFuncaoInput );
+	fprintf(dst, "5a " );
+
+}
+
+void traduzSTOPOp (FILE *dst) {
+	fprintf (dst, "b8 01 00 00 00 bb 00 00 00 00 cd 80");
+}
+
+void traduzCONSTOp(FILE *dst, char *numeroInvertido) {
+	fprintf(dst, "%s ", numeroInvertido );
+}
+
+
+void traduzSPACEOp(FILE *dst,  int quantidade) {
+	
+	while (--quantidade>0)
+		fprintf (dst, "00 00");
+}
+
+void escreveFuncaoEscreverInteiroOp(FILE * arq, char * numSaida, char *enderecoDez, char * numSaidaStringAuxEndereco, char * numSaidaStringEndereco, char * enterString) {
+
+	fprintf(arq, "c8 00 00 00 ");//fprintf(arq, "%s","enter 0,0\n");
+	fprintf(arq, "50 ");//fprintf(arq, "%s","push eax\n");
+	fprintf(arq, "53 ");//fprintf(arq, "%s","push ebx\n");
+	fprintf(arq, "51 ");//fprintf(arq, "%s","push ecx\n");
+	fprintf(arq, "52 ");//fprintf(arq, "%s","push edx\n");
+	fprintf(arq, "a2 %s ", numSaida );//fprintf(arq, "%s","mov eax, dword [numSaida]\n");
+
+	fprintf(arq, "31 c9 ");//fprintf(arq, "%s","xor ecx, ecx\n");
+	fprintf(arq, "31 d2 ");//fprintf(arq, "%s","xor edx, edx\n");
+	fprintf(arq, "31 db ");//fprintf(arq, "%s","xor ebx, ebx\n");
+
+	//fprintf(arq, "%s","loop1:\n");
+	fprintf(arq, "41 ");//fprintf(arq, "%s","inc ecx\n");
+	fprintf(arq, "31 d2 ");//fprintf(arq, "%s","xor edx, edx\n");
+	fprintf(arq, "f7 35 %s ", enderecoDez);//fprintf(arq, "%s","div dword [_dez_]\n");
+	fprintf(arq, "83 f8 00");//fprintf(arq, "%s","cmp eax, 0\n");
+	
+	//PULO OPCODE INDEFINIDO//
+	//fprintf(arq, "7e ", );//fprintf(arq, "%s","jle fim\n");
+    //*****************************//
+	
+	fprintf(arq, "88 93 %s", numSaidaStringAuxEndereco);//fprintf(arq, "%s","mov byte [numSaidaStringAux + ebx], dl\n");
+	fprintf(arq, "80 83 %s 30", numSaidaStringAuxEndereco);//fprintf(arq, "%s","add byte [numSaidaStringAux + ebx], 0x30\n");
+	fprintf(arq, "43 " )//fprintf(arq, "%s","inc ebx\n");
+
+	//PULO OPCODE INDEFINIDO//
+	//fprintf(arq, "%s","jmp loop1\n");
+    //***********************//
+
+	fprintf(arq, "31 d2 ");//fprintf(arq, "%s","xor ebx, ebx\n");
+
+	//fprintf(arq, "%s","fim:\n");
+	fprintf(arq, "88 93 %s", numSaidaStringAuxEndereco);//fprintf(arq, "%s","mov byte [numSaidaStringAux + ebx], dl\n");
+	fprintf(arq, "80 83 %s 30", numSaidaStringAuxEndereco);//fprintf(arq, "%s","add byte [numSaidaStringAux + ebx], 0x30\n");
+
+	fprintf(arq, "31 db ");//fprintf(arq, "%s","xor ebx, ebx\n");
+	//fprintf(arq, "%s","loop2:\n");
+
+	fprintf(arq, "8a 81 %s ", numSaidaStringAuxEndereco);//fprintf(arq, "%s","mov al, byte [numSaidaStringAux + ecx];\n");
+	fprintf(arq, "88 93 %s ", numSaidaStringEndereco);////fprintf(arq, "%s","mov byte [numSaidaString + ebx], al\n");
+
+	fprintf(arq, "83 f9 00 ");//fprintf(arq, "%s","cmp ecx, 0\n");
+	//PULO OPCODE INDEFINIDO
+	//fprintf(arq, "%s","je fim2\n");
+    /********************************/
+	fprintf(arq, "43 ");//fprintf(arq, "%s","inc ebx\n");
+	fprintf(arq, "49 ");////fprintf(arq, "%s","dec ecx\n");
+	
+	// PULO OPCODE INDEFINIDO
+	//fprintf(arq, "%s","jmp loop2\n");
+	// *********************************//
+	//fprintf(arq, "%s","fim2:\n");
+
+	fprintf(arq, "b8 04 00 00 00 ");////fprintf(arq, "%s","mov eax, 4\n");
+	fprintf(arq, "bb 01 00 00 00 ");//fprintf(arq, "%s","mov ebx, 1\n");
+	fprintf(arq, "b9 %s ", numSaidaStringEndereco);//fprintf(arq, "%s","mov ecx, numSaidaString\n");
+	fprintf(arq, "ba 0b 00 00 00 ");//fprintf(arq, "%s","mov edx, 11\n");
+	fprintf(arq, "cd 80 ");//fprintf(arq, "%s","int 80h\n");
+
+/**Adicionei um enter no fim do número aqui*/
+	fprintf(arq, "b8 04 00 00 00 ");//fprintf (arq, "mov eax, 4\n");
+	fprintf(arq, "bb 01 00 00 00 ");//fprintf (arq, "mov ebx, 1\n");
+	fprintf(arq, "b9 %s ", enterString);//fprintf (arq, "mov ecx, _enter_\n");
+	fprintf(arq, "ba 02 00 00 00 ");//fprintf (arq, "mov edx, 2\n");
+	fprintf(arq, "cd 80 ");//fprintf(arq, "%s","int 80h\n");
+/**/
+	fprintf(arq, "5a ");//fprintf(arq, "%s","pop edx\n");
+	fprintf(arq, "59 ");//fprintf(arq, "%s","pop ecx\n");
+	fprintf(arq, "5b ");//fprintf(arq, "%s","pop ebx\n");
+	fprintf(arq, "58");//fprintf(arq, "%s","pop eax\n");
+	fprintf(arq, "c9 ");////fprintf(arq, "%s","leave\n");
+	fprintf(arq, "c3 ");//fprintf(arq, "%s","ret\n");
+}
+
+/*Funcao para escrever no dst do assembly ia32 a funcao lerInteiro*/
+void escreveFuncaoLerInteiroOp(FILE * arq, char * enderecoStringLeitura, char * enderecoStringnumEntrada, char * enderecoStringDez) {
+
+	//fprintf(arq, "\n\nsection .text");
+	fprintf(arq, "c8 00 00 00 ");//fprintf(arq, "%s","enter 0,0\n");
+	fprintf(arq, "50 ");//fprintf(arq, "%s","push eax\n");
+	fprintf(arq, "53 ");//fprintf(arq, "%s","push ebx\n");
+	fprintf(arq, "51 ");//fprintf(arq, "%s","push ecx\n");
+	fprintf(arq, "52 ");//fprintf(arq, "%s","push edx\n");
+	fprintf(arq, "56 ");//fprintf(arq, "%s","\npush esi");
+
+	//fprintf(arq, "%s","\n; ler numero");
+	fprintf(arq, "b8 03 00 00 00 ");//fprintf(arq, "%s","\nmov eax, 3");
+	fprintf(arq, "bb 00 00 00 00 ");//fprintf(arq, "%s","\nmov ebx, 0");
+	fprintf(arq, "b9 %s ", enderecoStringLeitura);//fprintf(arq, "%s","\nmov ecx, _leitura_");
+	fprintf(arq, "ba 0a 00 00 00 ");//fprintf(arq, "%s","\nmov edx, 10");
+	fprintf(arq, "cd 80 ");//fprintf(arq, "%s","\nint 80h");liza
+
+	fprintf(arq, "b8 00 00 00 ");////fprintf(arq, "%s","\nmov eax, 0; comecar as posicoes da string");
+	fprintf(arq, "c7 05 %s ", enderecoStringnumEntrada);////fprintf(arq, "%s","\nmov [numEntrada], DWORD 0; inicializacao do numero de saida");
+	fprintf(arq, "be %s ", enderecoStringLeitura);//fprintf(arq, "%s","\nmov esi, _leitura_");
+
+	//fprintf(arq, "%s","\nloop_soma:");
+	fprintf(arq, "31 db ");//fprintf(arq, "%s","\nxor ebx, ebx");
+	fprintf(arq, "8a 1e ");//fprintf(arq, "%s","\nmov bl, byte [esi]");
+
+	fprintf(arq, "80 fb 0a ");//fprintf(arq, "%s","\ncmp bl, 10 ; 10 = /n na tabela ASCII");
+	// Pulo Opcode Indeterminado 
+	//fprintf(arq, "%s","\nje SAI");
+	// *******************************8/
+
+
+	fprintf(arq, "80 eb 30  ");//fprintf(arq, "%s","\nsub  bl, 0x30; conserta char");
+	fprintf(arq, "a1 %s ", enderecoStringnumEntrada);//fprintf(arq, "%s","\nmov eax, dword [numEntrada]");
+	fprintf(arq, "f7 25 %s ", enderecoStringDez);//fprintf(arq, "%s","\nmul dword [_dez_]");
+	fprintf(arq, "A3 %s ", enderecoStringnumEntrada);//fprintf(arq, "%s","\nmov dword [numEntrada], eax ");
+	fprintf(arq, "01 1d %s ", enderecoStringnumEntrada);//fprintf(arq, "%s","\nadd dword [numEntrada], ebx");
+
+	fprintf(arq, "46 ");//fprintf(arq, "%s","\ninc esi");
+    
+    // Utizando offset ate o loop_soma
+	//fprintf(arq, "%s","\nloop loop_soma");
+    //fprintf(arq, "E2 offset ");//
+	//fprintf(arq, "%s","\nSAI:");
+
+	fprintf(arq, "5e ");//fprintf(arq, "%s","\npop esi");
+	fprintf(arq, "5a ");//fprintf(arq, "%s","\npop edx");
+	fprintf(arq, "59 ");//fprintf(arq, "%s","\npop ecx");
+	fprintf(arq, "5b ");//fprintf(arq, "%s","\npop ebx");
+	fprintf(arq, "58 ");//fprintf(arq, "%s","\npop eax");
+	fprintf(arq, "c9 ");//fprintf(arq, "%s","\nleave");
+	fprintf(arq, "c3 ");//fprintf(arq, "%s","\nret\n");
+}
+
 /*
 int main()
 {
