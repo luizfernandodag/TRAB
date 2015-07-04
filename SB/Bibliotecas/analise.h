@@ -252,23 +252,26 @@ int tam_instr (char *instr, int mod1){
 
 	/*jmp tem 2 bytes*/
 	else if (!strcmp(instr, "jmp"))
-		return 4;
+		return 5;
 
 	/*jmps com comparação tem 3 bytes para a comparação + 2 para o jump*/
 	else if (!strcmp(instr, "jmpn")||!strcmp(instr, "jmpp")||!strcmp(instr, "jmpz"))
-		return 5;
+		return 9;
 
 	/*Se a gente manter o push/pop então 14 bytes e caso contrário 12 bytes*/
 	else if (!strcmp(instr, "copy"))
-		return 12 + 2;
+		return 15;
 
 	/*Load/store com o eax precisa de 5 bytes*/
 	else if (!strcmp(instr, "load")||!strcmp(instr, "store"))
 		return 5;
 
 	/*Input e output*/
-	else if (!strcmp(instr, "input")||!strcmp(instr, "output"))
+	else if (!strcmp(instr, "input"))
 		return 19;
+
+	else if (!strcmp(instr, "output"))
+		return 20;
 
 	/*Stop*/
 	else if (!strcmp(instr, "stop"))
