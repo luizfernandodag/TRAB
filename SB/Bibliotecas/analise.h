@@ -181,6 +181,8 @@ SYMBOL_TABLE* analise (char *src_name) {
 		}
 	}
 
+	code_size = mem_counter_code + mem_counter_data;
+
 	if (tem_codigo == false)
 		relata_erros (216, NULL, NULL);
 	fclose(entrada);
@@ -250,7 +252,7 @@ int tam_instr (char *instr, int mod1){
 
 	/*jmp tem 2 bytes*/
 	else if (!strcmp(instr, "jmp"))
-		return 2;
+		return 4;
 
 	/*jmps com comparação tem 3 bytes para a comparação + 2 para o jump*/
 	else if (!strcmp(instr, "jmpn")||!strcmp(instr, "jmpp")||!strcmp(instr, "jmpz"))

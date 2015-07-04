@@ -34,6 +34,7 @@ bool valida_linhacomando (int argc, char **argv);
 void pre_processamento (char *entrada, char *saida);
 SYMBOL_TABLE* analise (char *src_name);
 void sintese_linguagem (char *src_name, char *dst_name);
+void sintese_codigo (char *in_name, char *out_name, SYMBOL_TABLE *comeco_tabela);
 void relata_erros (int codigo, char *aux, char *aux2);
 
 /*Pre-processamento*/
@@ -81,6 +82,26 @@ void traduzSPACE(FILE *dst, char *arg1, int offset1);
 void escreveFuncaoEscreverInteiro(FILE * arq);
 void escreveFuncaoLerInteiro(FILE * arq);
 
+void traduzADDOp(FILE *arquivo, int endereco);
+void traduzSUBOp(FILE *dst, int endereco);
+void traduzMULTOp(FILE *dst, int endereco);
+void traduzDIVOp(FILE *dst, int endereco);
+void traduzJMPOp(FILE *dst, int endereco);
+void traduzJMPNOp(FILE *dst, int endereco);
+void traduzJMPPOp(FILE *dst, int endereco);
+void traduzJMPZOp(FILE *dst, int endereco);
+void traduzCOPYOp(FILE *dst, int enderecoVariavel1, int enderecoVariavel2 );
+void traduzLOADOp(FILE *dst, int enderecoVariavel);
+void traduzStoreOp(FILE *dst, int enderecoVariavel);
+void traduzINPUTOp(FILE *dst, int enderecoFuncaoInput, int endereconumEntrada, int enderecoVariavel);
+void traduzOUTPUTOp(FILE *dst, int enderecoFuncaoOutput, int endereconumSaida, int enderecoVariavel);
+void traduzSTOPOp(FILE *dst);
+void traduzCONSTOp(FILE *dst, int numeroInvertido);
+void traduzSPACEOp(FILE *dst,  int quantidade);
+void escreveFuncaoEscreverInteiroOp(FILE * arq, int numSaida, int enderecoDez, int numSaidaStringAuxEndereco, int numSaidaStringEndereco, int enterString);
+void escreveFuncaoLerInteiroOp(FILE * arq, int enderecoStringLeitura, int enderecoStringnumEntrada, int enderecoStringDez);
+
+
 /*Outros*/
 int converte_int (char *token);					/*Converte uma sequencia de caracteres em 1 número*/
 bool copy_file (char *src, char *dst);			/*Copia um arquivo para outro lugar*/
@@ -97,6 +118,7 @@ int passagem = 1;
 int line_counter = 0;
 int mem_counter_code = 0;
 int mem_counter_data = 0;
+int code_size = 0;
 int section = 0;
 bool tem_codigo = false;
 bool usa_input = false;
