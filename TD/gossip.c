@@ -7,135 +7,39 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define 	BUFFER_SIZE			1024
-#define		PORTA_DEFAULT		10101
-#define		PORTA_MINIMA		00001						/*li que o S.O. quer pegar as portas menores, nao sei se tenho que limitar aqui*/
-#define		PORTA_MAXIMA		20000						/*nao sei se eu tenho que limitar aqui*/
-#define		LocalHost			"127.0.0.1"
-#define		NumConexoes			2
-#define		tickTime			1
-#define		TIMEOUT				10
+#define 	BUFFERSIZE		1024
+#define		PORTA_DEFAULT	10101
+#define		PORTA_MINIMA	2000	/*li que o S.O. quer pegar as portas menores, nao sei se tenho que limitar aqui*/
+#define		LocalHost		"127.0.0.1"
+#define		NumConexoes		2
+#define		tickTime		1
 
 /*Comportamentos de cliente e servidor*/
-int wait_contact (int request_socket, int timeout_time);
-void serv_behaviour(int argc, char *argv[]);
-void client_behaviour(int argc, char *argv[]);
+void servidor (int porta);
+void cliente (int porta);
 
 /*Funções mistas*/
 bool valida_cli (int argc, char **argv);
 bool eh_servidor (char *string);
 int porta_da_fofoca (int argc, char *string);
 void relata_erros (int codigo);
+struct sockaddr_in caracteristicas_endereco (int porta);
 
 int main(int argc, char *argv[]) {
-
-    int request_socket, fofoca_socket;
-    char emissor_Buffer[BUFFER_SIZE], receiver_Buffer[BUFFER_SIZE];
-    struct sockaddr_in fofocador_serv, fofocador_cliente;
-    int msg_size;
 
     /*Se a cli não passar o teste de validade, nem execute*/
 	if (!valida_cli(argc, argv))
 		return 0;
 
-    /*Se for servidor, funcione como servidor*/
-    if (eh_servidor(argv[1])){
+	if (eh_servidor(argv[1])){
+		printf ("sou servidor na porta %d\n", porta_da_fofoca(argc, argv[2]));
 
-		printf ("Eu sou o servidor.\n");
-
-		/*Abre o socket para possibilitar a comunicação 1 para 1*/
-		if ((request_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-			printf("Nao foi possivel criar o soquete.\n");
-			return 0;
-		}
-
-		/*Definindo os parâmetros do servidor*/
-		fofocador_serv.sin_family = AF_INET;
-		fofocador_serv.sin_port = htons(porta_da_fofoca(argc, argv[2]));
-		fofocador_serv.sin_addr.s_addr = inet_addr(LocalHost);
-		bzero(&(fofocador_serv.sin_zero),8);
-
-		/*Pegando a porta*/
-		bind(request_socket, (struct sockaddr *)&fofocador_serv, sizeof(struct sockaddr));
-		listen(request_socket, NumConexoes);
-
-		/*Espera um sinal de vida*/
-		do {
-			sleep(tickTime);
-			fofoca_socket = accept(request_socket, (struct sockaddr*)NULL, NULL);
-		}
-		while (fofoca_socket <= 0);
-
-		/*Recebi um sinal de vida, manda o oi*/
-		strcpy (emissor_Buffer, "HELLO CLT\n\0");
-		write(fofoca_socket, emissor_Buffer, strlen(emissor_Buffer));
-
-		/*Operação principal*/
-		for (; true; sleep(tickTime)) {
-
-			/*Tenta ler alguma coisa*/
-			msg_size = read(fofoca_socket, receiver_Buffer, sizeof(receiver_Buffer)-1);
-
-			/*Se recebi uma mensagem, escreva-a no terminal*/
-			if (msg_size > 0) {
-				receiver_Buffer[msg_size] = 0;
-				puts(receiver_Buffer);
-
-				/*Fim da fofoca*/
-				strcpy(emissor_Buffer, "BYE CLT\n\0");
-				write(fofoca_socket, emissor_Buffer, strlen(emissor_Buffer));
-				close(fofoca_socket);
-				return 0;
-			}
-
-		}
+		servidor(porta_da_fofoca(argc, argv[2]));
 	}
-
-	/*Se não eh servidor, eh cliente*/
 	else {
+		printf ("sou cliente na porta %d\n", porta_da_fofoca(argc, argv[2]));
 
-		/*Abre o socket para possibilitar a comunicação 1 para 1*/
-		if((fofoca_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-			printf("Nao foi possivel criar o soquete.\n");
-			return 0;
-		}
-
-		/*Definindo os parâmetros do cliente*/
-		fofocador_cliente.sin_family = AF_INET;
-		fofocador_cliente.sin_port = htons(porta_da_fofoca(argc, argv[2]));
-		fofocador_cliente.sin_addr.s_addr = inet_addr(LocalHost);
-		bzero(&(fofocador_cliente.sin_zero),8);
-
-		/*Tentando conexão*/
-		if (connect(fofoca_socket, (struct sockaddr *) & fofocador_cliente, sizeof(fofocador_cliente)) < 0 ){
-			printf ("Falha de conexao.\n");
-			printf ("Tem algum servidor disponivel ai?\n");
-			return 0;
-		}
-
-		/*Consegui conexao, manda um oi*/
-		strcpy(emissor_Buffer, "HELLO SRV\n\0");
-		write(fofoca_socket, emissor_Buffer, strlen(emissor_Buffer));
-
-		/*Vê se o servidor fala algo*/
-		for (; true ; sleep(tickTime)) {
-
-			/*Tenta ler alguma coisa*/
-			msg_size = read(fofoca_socket, receiver_Buffer, sizeof(receiver_Buffer)-1);
-
-			/*Recebi mensagem*/
-			if (msg_size >=0) {
-
-				/*Se recebi uma mensagem, escreva no terminal*/
-				puts(receiver_Buffer);
-
-				/*Fim da fofoca*/
-				strcpy(emissor_Buffer, "BYE SRV\n\0");
-				write(fofoca_socket, emissor_Buffer, strlen(emissor_Buffer));
-				close(fofoca_socket);
-				return 0;
-			}
-		}
+		cliente(porta_da_fofoca(argc, argv[2]));
 	}
 
     return 0;
@@ -161,7 +65,7 @@ bool valida_cli (int argc, char **argv) {
 	A priori vou usar o localhost 127.0.0.x com x=1,2,3,...,255*/
     if (argc==3) {
 		temp = atoi(argv[2]);
-		if (temp < PORTA_MINIMA || temp > PORTA_MAXIMA) {
+		if (temp <= PORTA_MINIMA) {
 			relata_erros(3);
 			return false;
 		}
@@ -201,5 +105,111 @@ void relata_erros (int codigo) {
 		case 3:
 			printf ("A porta de acesso tem que ser um numero positivo nao nulo. Pelo menos eu acho.\n");
 			break;
+
+		default:
+			;
 	}
+}
+
+struct sockaddr_in caracteristicas_endereco (int porta) {
+
+	struct sockaddr_in a;
+
+	a.sin_family = AF_INET;
+    a.sin_port = htons(porta);
+    a.sin_addr.s_addr = inet_addr(LocalHost);
+
+	return a;
+}
+
+void servidor (int porta) {
+
+	char mensagem[1024];
+
+	int listenfd = 0, connfd = 0;
+
+	struct sockaddr_in serv_addr;
+
+	char sendBuff[1025];
+
+	listenfd = socket(AF_INET, SOCK_STREAM, 0);
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	memset(sendBuff, '0', sizeof(sendBuff));
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr.sin_port = htons(porta);
+
+	bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+	listen(listenfd, 10);
+
+	/*espera um primeiro contato*/
+	connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
+
+	/*manda um oi*/
+	snprintf(sendBuff, sizeof(sendBuff), "Hello Client\n");
+	write(connfd, sendBuff, strlen(sendBuff));
+
+	/*Operação principal, escreve sem parar */
+	while(scanf(" %s", mensagem) > 0)
+	{
+		printf ("mensagem a ser enviada: '%s'\n", mensagem);
+		write(connfd, mensagem, strlen(mensagem));
+		printf ("mensagem enviada.\n");
+		sleep(1);
+	}
+
+	close(connfd);
+}
+
+void cliente (int porta){
+    int sockfd = 0, n = 0;
+    char recvBuff[1024];
+    struct sockaddr_in serv_addr;
+
+    memset(recvBuff, '0',sizeof(recvBuff));
+
+    if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        printf("\n Error : Could not create socket \n");
+        return;
+    }
+
+    memset(&serv_addr, '0', sizeof(serv_addr));
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(porta);
+
+    if(inet_pton(AF_INET, LocalHost, &serv_addr.sin_addr)<=0)
+    {
+        printf("\n inet_pton error occured\n");
+        return;
+    }
+
+    if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
+       printf("\n Error : Connect Failed \n");
+       return;
+    }
+
+	while (true) {
+
+		/*leitura*/
+		while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0) {
+		recvBuff[n] = 0;
+
+		if(fputs(recvBuff, stdout) == EOF)
+			printf("\n Error : Fputs error\n");
+
+		/**/
+		/*espera um contato*/
+		sockfd = accept(sockfd, (struct sockaddr*)NULL, NULL);
+		}
+	}
+
+    if(n < 0)
+    {
+        printf("\n Read error \n");
+    }
 }

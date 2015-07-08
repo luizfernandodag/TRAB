@@ -23,7 +23,7 @@
 #ifdef __unix__
 	#include <termios.h>
 	#define NO_TIMEOUT	0
-
+	
 /*********************************************************************************************************************************************/
 /*FUNCTION DECLARATIONS*/
 /*"Public", Intended to be called from outside this file*/
@@ -57,12 +57,12 @@ char getch_(int echo, int timeout) {
 	static struct termios old_console, new_console;
 	tcgetattr(0, &old_console);			/* grab old terminal i/o settings */
 	new_console = old_console;			/* copy the old settings */
-
+	
 	/*ALTERING THE TERMINAL SETTINGS*/
 	new_console.c_lflag &= ~ICANON;			/* disable buffered i/o */
 	new_console.c_lflag &= echo ? ECHO : ~ECHO;	/* set echo mode to the user's input*/
 	new_console.c_cc[VMIN]=0;			/* it's allowed to return empty-handed*/
-	new_console.c_cc[VTIME]=timeout;			/* if the user doesn't give input for longer than "timeout", returns EOF*/
+	new_console.c_cc[VTIME]=timeout			/* if the user doesn't give input for longer than "timeout", returns EOF*/
 	tcsetattr(0, TCSANOW, &new_console);		/* use these newly defined i/o settings now */
 
 	/*GRABBING INPUT*/
