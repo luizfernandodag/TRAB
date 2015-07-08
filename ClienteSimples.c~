@@ -61,8 +61,6 @@ int main(int argc, char *argv[])
 		buf[numbytes] = '\0';
 		printf("Recebido: %s",buf);
 		}
-
-		sleep(100);
 	}
 	close(Meusocket);
 	return 0;

@@ -1,0 +1,9 @@
+all: hello
+
+hello: client.o server.o
+	gcc -o client.o server.o 
+
+client.o: 
+	gcc client.c 
+server.o: 
+	gcc server.c 
