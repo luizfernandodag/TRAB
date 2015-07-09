@@ -172,7 +172,7 @@ void servidor (int porta) {
 
 			/*suporte à backspace*/
 			if (c == '\b')
-				sendBuffer[i--] = '\0';
+				sendBuffer[--i] = '\0';
 
 			/*enter envia a mensagem*/
 			if (c == '\n'){
@@ -196,7 +196,6 @@ void servidor (int porta) {
 			if (!strcmp("HELLO SRV\n", receiveBuffer)){
 				strcpy(sendBuffer, "HELLO CLT\n\0");
 				write(soquete, sendBuffer, strlen(sendBuffer)+1);
-				return;
 			}
 
 			/*se receber o tchau, feche*/
@@ -244,8 +243,8 @@ void cliente (int porta){
 	}
 
 	/*manda um oi*/
-	snprintf(sendBuffer, sizeof(sendBuffer), "HELLO SRV\n");
-	write(soquete, sendBuffer, strlen(sendBuffer));
+	strcpy(sendBuffer, "HELLO SRV\n\0");
+	write(soquete, sendBuffer, 1+strlen(sendBuffer));
 
 	while (true) {
 
@@ -261,7 +260,7 @@ void cliente (int porta){
 			if (c == '\n'){
 				/*envia a mensagem*/
 				sendBuffer[i] = '\0';
-				write(soquete, sendBuffer, strlen(sendBuffer));
+				write(soquete, sendBuffer, 1+strlen(sendBuffer));
 				sleep(1);
 
 				/*prepara para um novo envio*/
@@ -278,7 +277,7 @@ void cliente (int porta){
 			/*se receber o tchau, é hora de dar tchau*/
 			if (!strcmp("BYE CLT\n", receiveBuffer)){
 				strcpy(sendBuffer, "BYE SRV\n\0");
-				write(soquete, sendBuffer, strlen(sendBuffer));
+				write(soquete, sendBuffer, 1+strlen(sendBuffer));
 				return;
 			}
 		}
